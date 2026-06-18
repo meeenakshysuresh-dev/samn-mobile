@@ -8319,6 +8319,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-linear-gradient@npm:^2.8.3":
+  version: 2.8.3
+  resolution: "react-native-linear-gradient@npm:2.8.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: f980d324e551bbc475c6406bdc5250a08242020cbe653412fa169bbdf51e28a502e225de105b4d696d6a1a1b733d44782469020f4936d8b3ce0e2c78e51cf58f
+  languageName: node
+  linkType: hard
+
 "react-native-safe-area-context@npm:^5.8.0":
   version: 5.8.0
   resolution: "react-native-safe-area-context@npm:5.8.0"
@@ -8695,6 +8705,7 @@ __metadata:
     react-native-blob-util: ^0.24.9
     react-native-gesture-handler: ^3.0.1
     react-native-image-picker: ^8.2.1
+    react-native-linear-gradient: ^2.8.3
     react-native-safe-area-context: ^5.8.0
     react-native-screens: ^4.25.2
     react-native-vector-icons: ^10.3.0

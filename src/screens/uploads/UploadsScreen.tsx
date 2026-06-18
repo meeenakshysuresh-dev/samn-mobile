@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, View } from 'react-native';
 import { pick, errorCodes, isErrorWithCode, types } from '@react-native-documents/picker';
-import { launchImageLibrary, type Asset } from 'react-native-image-picker';
+import type { Asset } from 'react-native-image-picker';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Button } from '../../components/Button';
-import { Screen } from '../../components/Screen';
+import { AppButton, AppText, Screen, SectionHeading, usePhotoPicker } from '../../components';
 import type { RootStackParamList, UploadsStackParamList } from '../../navigation';
 import { uploadFile, type UploadFilePart } from '../../services/uploadService';
 import { useAppTheme } from '../../theme/useAppTheme';
@@ -29,7 +28,7 @@ const toImageFilePart = (asset: Asset): UploadFilePart | null => {
 };
 
 export const UploadsScreen = ({ navigation }: Props) => {
-  const { colors } = useAppTheme();
+  const { theme } = useAppTheme();
   const [status, setStatus] = useState('No upload selected');
   const [isUploading, setIsUploading] = useState(false);
 
@@ -49,31 +48,26 @@ export const UploadsScreen = ({ navigation }: Props) => {
     }
   };
 
-  const chooseImage = async () => {
-    const response = await launchImageLibrary({
-      mediaType: 'photo',
-      selectionLimit: 1,
-      quality: 0.9,
-    });
-
-    if (response.didCancel) {
-      return;
-    }
-
-    if (response.errorMessage) {
-      Alert.alert('Image picker error', response.errorMessage);
-      return;
-    }
-
-    const file = response.assets?.[0] ? toImageFilePart(response.assets[0]) : null;
-
-    if (!file) {
-      Alert.alert('No image selected', 'Please select an image with a valid file URI.');
-      return;
-    }
-
-    await submitUpload(file);
-  };
+  const { open: openPhotoPicker, PickerSheet } = usePhotoPicker(
+    {
+      onPicked: async ({ asset, source }) => {
+        const file = toImageFilePart(asset);
+        if (!file) {
+          Alert.alert('No image selected', 'Please select an image with a valid file URI.');
+          return;
+        }
+        setStatus(`Selected from ${source}`);
+        await submitUpload(file);
+      },
+      onError: (message) => {
+        Alert.alert('Photo picker error', message);
+      },
+    },
+    {
+      title: 'Add Photo',
+      subtitle: 'Take a new photo or choose one from your gallery.',
+    },
+  );
 
   const chooseDocument = async () => {
     try {
@@ -98,39 +92,43 @@ export const UploadsScreen = ({ navigation }: Props) => {
 
   return (
     <Screen>
-      <Text style={[styles.title, { color: colors.text }]}>Uploads</Text>
-      <Text style={[styles.subtitle, { color: colors.mutedText }]}>
-        Pick an image or document and upload it with axios multipart.
-      </Text>
+      <SectionHeading title="UPLOADS" />
+      <AppText preset="heading2" style={styles.title}>
+        Uploads
+      </AppText>
+      <AppText preset="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
+        Pick an image from camera or gallery, or choose a document to upload.
+      </AppText>
 
-      <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Button label="Choose Image" icon="image" disabled={isUploading} onPress={chooseImage} />
-        <Button label="Choose File" icon="file" disabled={isUploading} onPress={chooseDocument} />
+      <View style={[styles.panel, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <AppButton text="Choose Image" icon="image" disabled={isUploading} onPress={openPhotoPicker} />
+        <AppButton text="Choose File" icon="file" disabled={isUploading} onPress={chooseDocument} />
 
         <View style={styles.statusRow}>
-          {isUploading ? <ActivityIndicator color={colors.primary} /> : null}
-          <Text style={[styles.status, { color: colors.text }]}>{status}</Text>
+          {isUploading ? <ActivityIndicator color={theme.primary} /> : null}
+          <AppText preset="body" style={styles.status}>
+            {status}
+          </AppText>
         </View>
       </View>
+
+      {PickerSheet}
     </Screen>
   );
 };
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 26,
-    fontWeight: '800',
+    marginBottom: 8,
   },
   subtitle: {
-    marginTop: 8,
     marginBottom: 22,
-    fontSize: 16,
     lineHeight: 22,
   },
   panel: {
     gap: 14,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
   },
   statusRow: {
@@ -141,6 +139,5 @@ const styles = StyleSheet.create({
   },
   status: {
     flex: 1,
-    fontSize: 15,
   },
 });

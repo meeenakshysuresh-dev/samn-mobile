@@ -1,28 +1,57 @@
 import { useEffect } from 'react';
-import { Appearance } from 'react-native';
+import { DarkTheme as NavigationDarkTheme, DefaultTheme } from '@react-navigation/native';
 
-import { darkColors, lightColors } from './theme';
-import { useThemeStore } from './themeStore';
+import type { ThemePreference } from './theme.types';
+import { DarkTheme, LightTheme } from './themes';
+import { useThemeStore } from './useThemeStore';
 
-export const useAppTheme = () => {
-  const preference = useThemeStore(state => state.preference);
-  const systemScheme = useThemeStore(state => state.systemScheme);
-  const setSystemScheme = useThemeStore(state => state.setSystemScheme);
-  const activeScheme = preference === 'system' ? systemScheme : preference;
-  const colors = activeScheme === 'dark' ? darkColors : lightColors;
-
-  useEffect(() => {
-    const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      setSystemScheme(colorScheme === 'dark' ? 'dark' : 'light');
-    });
-
-    return () => subscription.remove();
-  }, [setSystemScheme]);
+const buildNavigationTheme = (isDark: boolean) => {
+  const palette = isDark ? DarkTheme : LightTheme;
+  const base = isDark ? NavigationDarkTheme : DefaultTheme;
 
   return {
-    colors,
-    isDark: activeScheme === 'dark',
+    ...base,
+    dark: isDark,
+    colors: {
+      ...base.colors,
+      primary: palette.primary,
+      background: palette.background,
+      card: palette.card,
+      text: palette.textPrimary,
+      border: palette.border,
+      notification: palette.error,
+    },
+  };
+};
+
+export const useAppTheme = () => {
+  const mode = useThemeStore(state => state.mode);
+  const colorScheme = useThemeStore(state => state.colorScheme);
+  const theme = useThemeStore(state => state.theme);
+  const setMode = useThemeStore(state => state.setMode);
+  const initialize = useThemeStore(state => state.initialize);
+
+  useEffect(() => initialize(), [initialize]);
+
+  const isDark = (colorScheme ?? 'light') === 'dark';
+  const preference: ThemePreference = mode;
+
+  return {
+    theme,
+    colors: {
+      background: theme.background,
+      surface: theme.surfacePrimary,
+      border: theme.border,
+      text: theme.textPrimary,
+      mutedText: theme.textSecondary,
+      primary: theme.primary,
+      success: theme.success,
+      danger: theme.error,
+      navigation: buildNavigationTheme(isDark),
+    },
+    isDark,
     preference,
-    activeScheme,
+    activeScheme: colorScheme ?? 'light',
+    setPreference: setMode,
   };
 };

@@ -1,16 +1,32 @@
-import React, { type PropsWithChildren } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 
-import { useAppTheme } from '../theme/useAppTheme';
+import { TAB_BAR_DEFAULT_INSET, useTabBarInset } from '../navigation/tabBarLayout';
+import { useThemeStore } from '../theme/useThemeStore';
+import { AppView } from './AppView';
 
-export const Screen = ({ children }: PropsWithChildren) => {
-  const { colors } = useAppTheme();
+type ScreenProps = {
+  children: React.ReactNode;
+};
 
-  return <View style={[styles.container, { backgroundColor: colors.background }]}>{children}</View>;
+export const Screen = ({ children }: ScreenProps) => {
+  const theme = useThemeStore(state => state.theme);
+  const tabBarInset = useTabBarInset();
+
+  return (
+    <AppView style={[styles.container, { backgroundColor: theme.background }]}>
+      <AppView style={[styles.content, { paddingBottom: Math.max(tabBarInset, TAB_BAR_DEFAULT_INSET) }]}>
+        {children}
+      </AppView>
+    </AppView>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
     padding: 20,
   },

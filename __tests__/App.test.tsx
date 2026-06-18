@@ -37,6 +37,7 @@ jest.mock('@react-native-documents/picker', () => ({
 
 jest.mock('react-native-image-picker', () => ({
   launchImageLibrary: jest.fn(),
+  launchCamera: jest.fn(),
 }));
 
 jest.mock('react-native-blob-util', () => ({
@@ -44,6 +45,8 @@ jest.mock('react-native-blob-util', () => ({
     stat: jest.fn(),
   },
 }));
+
+jest.mock('react-native-linear-gradient', () => 'LinearGradient');
 
 test('renders correctly', async () => {
   await ReactTestRenderer.act(() => {
