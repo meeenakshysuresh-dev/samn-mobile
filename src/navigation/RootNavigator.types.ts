@@ -1,5 +1,10 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
+
 export type RootStackParamList = {
-  Auth: undefined;
+  Splash: undefined;
+  Auth: NavigatorScreenParams<AuthStackParamList> | undefined;
+  EmailVerification: undefined;
+  CompleteProfile: undefined;
   MainTabs: undefined;
   UploadDetails: {
     uploadId: string;
@@ -10,8 +15,7 @@ export type AuthStackParamList = {
   Login: undefined;
   SignUp: undefined;
   ForgotPassword: undefined;
-  OtpVerification: { email: string };
-  ResetPassword: { email: string };
+  ResetPassword: { oobCode: string };
   PasswordResetSuccess: undefined;
 };
 
@@ -25,6 +29,7 @@ export type MainTabParamList = {
 
 export type HomeStackParamList = {
   Dashboard: undefined;
+  Notifications: undefined;
 };
 
 export type CreateStackParamList = {

@@ -66,6 +66,7 @@ type GradientHeaderProps = {
   title?: string;
   subtitle?: string;
   onBack?: () => void;
+  showBackButton?: boolean;
   onSearch?: () => void;
   onScan?: () => void;
   onEdit?: () => void;
@@ -78,6 +79,7 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
   title,
   subtitle,
   onBack,
+  showBackButton = true,
   onSearch,
   onScan,
   onMore,
@@ -109,14 +111,18 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
     <LinearGradient colors={gradColors} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.gradientHeader}>
       <AppView style={[styles.gradientHeaderContent, { paddingTop: topPadding }]}>
         <AppView style={[styles.gsHeaderRow, { marginBottom: 0 }]}>
-          <TouchableOpacity
-            style={styles.gsBackBtnPill}
-            onPress={handleBack}
-            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-            accessibilityLabel="Go back"
-          >
-            <AppIcon name="chevronLeft" width={headerTokens.iconSize} height={headerTokens.iconSize} color={theme.headerText} rtlFlip={isRTL} />
-          </TouchableOpacity>
+          {showBackButton ? (
+            <TouchableOpacity
+              style={styles.gsBackBtnPill}
+              onPress={handleBack}
+              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+              accessibilityLabel="Go back"
+            >
+              <AppIcon name="chevronLeft" width={headerTokens.iconSize} height={headerTokens.iconSize} color={theme.headerText} rtlFlip={isRTL} />
+            </TouchableOpacity>
+          ) : (
+            <AppView style={styles.gsBackBtnPill} />
+          )}
 
           <AppView
             style={[

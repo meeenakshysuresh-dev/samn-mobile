@@ -3,20 +3,27 @@ import { ScrollView, StyleSheet } from 'react-native';
 import { getApp } from '@react-native-firebase/app';
 import { getCrashlytics, log } from '@react-native-firebase/crashlytics';
 import { useNavigation } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AppCard, AppText, AppView, DashboardHeader, SectionHeading } from '../../components';
+import { useAuth } from '../../hooks/useAuth';
 import { useNetworkStatus } from '../../hooks/useNetworkStatus';
 import { useTabBarInset, TAB_BAR_DEFAULT_INSET } from '../../navigation/tabBarLayout';
-import type { MainTabParamList } from '../../navigation/RootNavigator.types';
+import type { HomeStackParamList } from '../../navigation/RootNavigator.types';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { getFirstName } from '../../utils/userName';
+
+type Nav = NativeStackNavigationProp<HomeStackParamList, 'Dashboard'>;
 
 export const DashboardScreen = () => {
   const { theme, activeScheme } = useAppTheme();
   const network = useNetworkStatus();
   const tabBarInset = useTabBarInset();
-  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
+  const navigation = useNavigation<Nav>();
+  const { userProfile, user } = useAuth();
   const [firebaseAppName, setFirebaseAppName] = useState('default');
+
+  const firstName = getFirstName(userProfile?.fullName ?? user?.displayName);
 
   useEffect(() => {
     const app = getApp();
@@ -27,8 +34,8 @@ export const DashboardScreen = () => {
   return (
     <AppView style={[styles.container, { backgroundColor: theme.background }]}>
       <DashboardHeader
-        user={{ name: 'User' }}
-        onSettings={() => navigation.navigate('SettingsStack')}
+        user={{ name: firstName }}
+        onNotification={() => navigation.navigate('Notifications')}
         safeArea={false}
       />
 

@@ -2468,6 +2468,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@notifee/react-native@npm:^9.1.8":
+  version: 9.1.8
+  resolution: "@notifee/react-native@npm:9.1.8"
+  peerDependencies:
+    react-native: "*"
+  checksum: a144f7c5aa54a7e774c95b3a91341653865dfa4c8540b34ead3f281edd733830975c4f86bdfe422467d18ae97879b75be09ca25bb1818ba2ecfc56808cb570b1
+  languageName: node
+  linkType: hard
+
 "@protobufjs/aspromise@npm:^1.1.1, @protobufjs/aspromise@npm:^1.1.2":
   version: 1.1.2
   resolution: "@protobufjs/aspromise@npm:1.1.2"
@@ -2530,6 +2539,18 @@ __metadata:
   version: 1.1.1
   resolution: "@protobufjs/utf8@npm:1.1.1"
   checksum: 9352cf54a92219bd7eac9791c62f4d9abc27381a4b8d639e76ca33edb4813e6905c17ea1f894f4730ea1c6e99e69dac4484a661d6715193d88e90c1775df9fe9
+  languageName: node
+  linkType: hard
+
+"@react-native-async-storage/async-storage@npm:^3.1.1":
+  version: 3.1.1
+  resolution: "@react-native-async-storage/async-storage@npm:3.1.1"
+  dependencies:
+    idb: 8.0.3
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 4f2227cb7d7365bed1dc418404cb986aafcaefd7908671cc0f226fb7d264511b07c7d210699a997f7acda3c25f4ec23764f28ebf5e76cedd2438d5836fef9296
   languageName: node
   linkType: hard
 
@@ -2747,6 +2768,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/auth@npm:^24.1.1":
+  version: 24.1.1
+  resolution: "@react-native-firebase/auth@npm:24.1.1"
+  dependencies:
+    plist: ^3.1.0
+  peerDependencies:
+    "@react-native-firebase/app": 24.1.1
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: e096ed97dae5093faa9799a602b0695f6c84bf61ed0dc541a1ec631a8e104842cd5747cec0c78b4db393cda00bcbe3dfdb30459f815a8848ef65dc4f2a537f1f
+  languageName: node
+  linkType: hard
+
 "@react-native-firebase/crashlytics@npm:^24.1.1":
   version: 24.1.1
   resolution: "@react-native-firebase/crashlytics@npm:24.1.1"
@@ -2759,6 +2795,39 @@ __metadata:
     expo:
       optional: true
   checksum: 4eef58a64cdc920b1ab3b4add8775821564d69d830fc5c7c6e790b389486cfc7c263dba4e68874d6ad6311ba50ffbe235c8e9749eaf96ec331ccfc2df6761fa2
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/firestore@npm:^24.1.1":
+  version: 24.1.1
+  resolution: "@react-native-firebase/firestore@npm:24.1.1"
+  dependencies:
+    react-native-url-polyfill: 3.0.0
+  peerDependencies:
+    "@react-native-firebase/app": 24.1.1
+  checksum: 151143328d1057b81d4f18d6d4c1a259f08b9a51c5ce5783f918011b95c64c52ad6828ad4a78d521a291e33fa2611cee0319b9fffa9d4e86bb5925ddfb773f55
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/messaging@npm:^24.1.1":
+  version: 24.1.1
+  resolution: "@react-native-firebase/messaging@npm:24.1.1"
+  peerDependencies:
+    "@react-native-firebase/app": 24.1.1
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 31737143a547558acaf7deaf6610af1286ef3fcaa9939e710ae2dcc87265d46637e1a5f1e613bd59d1e0fd72c00e9ae7c48db576a39f45c1cdaa911c67772adf
+  languageName: node
+  linkType: hard
+
+"@react-native-firebase/storage@npm:^24.1.1":
+  version: 24.1.1
+  resolution: "@react-native-firebase/storage@npm:24.1.1"
+  peerDependencies:
+    "@react-native-firebase/app": 24.1.1
+  checksum: 4af4f63fbce8458709a05983148b85f6239457dd1b0109dea7381f02bcb6ff7478b740dbff3f8e68772c45728090f0f8a959b526e6ddcd9f4db1126aac4b67c6
   languageName: node
   linkType: hard
 
@@ -3462,6 +3531,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmldom/xmldom@npm:^0.9.10":
+  version: 0.9.10
+  resolution: "@xmldom/xmldom@npm:0.9.10"
+  checksum: 420f3ba52316163384ce626cda087d06b0eb5888d393b00bbc5f56489bbaccc8633e9b078942ee05facda93fbf813b209a5deb5044f89a6e04373305a0e573c0
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:^5.0.0":
   version: 5.0.0
   resolution: "abbrev@npm:5.0.0"
@@ -4070,7 +4146,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"buffer@npm:^5.5.0":
+"buffer@npm:^5.4.3, buffer@npm:^5.5.0":
   version: 5.7.1
   resolution: "buffer@npm:5.7.1"
   dependencies:
@@ -5947,6 +6023,13 @@ __metadata:
   version: 7.1.1
   resolution: "idb@npm:7.1.1"
   checksum: 1973c28d53c784b177bdef9f527ec89ec239ec7cf5fcbd987dae75a16c03f5b7dfcc8c6d3285716fd0309dd57739805390bd9f98ce23b1b7d8849a3b52de8d56
+  languageName: node
+  linkType: hard
+
+"idb@npm:8.0.3":
+  version: 8.0.3
+  resolution: "idb@npm:8.0.3"
+  checksum: e0f160be2b9a3b031db25a3bd134b5187f1b51d7e2cdc85a0e5ec62b0f635a7e37847d4888c9d919e7de1e9d8646a9390ce42d249b6a0b30d538c651ab1c3852
   languageName: node
   linkType: hard
 
@@ -8076,6 +8159,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"plist@npm:^3.1.0":
+  version: 3.1.1
+  resolution: "plist@npm:3.1.1"
+  dependencies:
+    "@xmldom/xmldom": ^0.9.10
+    base64-js: ^1.5.1
+    xmlbuilder: ^15.1.1
+  checksum: 775b2befb6df97b145193e5c241dc63929c58c89673eebc51e06b4b5b3403d15d921140278644ddf6f51a6936d46450d35903a84fc4cba071c46d9c33141817d
+  languageName: node
+  linkType: hard
+
 "possible-typed-array-names@npm:^1.0.0, possible-typed-array-names@npm:^1.1.0":
   version: 1.1.0
   resolution: "possible-typed-array-names@npm:1.1.0"
@@ -8173,7 +8267,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"punycode@npm:^2.1.0":
+"punycode@npm:^2.1.0, punycode@npm:^2.1.1":
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
   checksum: bb0a0ceedca4c3c57a9b981b90601579058903c62be23c5e8e843d2c2d4148a3ecf029d5133486fb0e1822b098ba8bba09e89d6b21742d02fa26bda6441a6fb2
@@ -8349,6 +8443,17 @@ __metadata:
     react: "*"
     react-native: ">=0.82.0"
   checksum: 075cb46262eba276a7af67e036d6d4eabf8d0964e2abf3efde33dbff3ddcdbe3e69d3b323363152e1e7fe9b36da614faf650c81dbc00e820594ce188d024dbbf
+  languageName: node
+  linkType: hard
+
+"react-native-url-polyfill@npm:3.0.0":
+  version: 3.0.0
+  resolution: "react-native-url-polyfill@npm:3.0.0"
+  dependencies:
+    whatwg-url-without-unicode: 8.0.0-3
+  peerDependencies:
+    react-native: "*"
+  checksum: 3d6e02b8c32933bca588b70e86c1b2981cd2d9f4055f7ce5ba5f321596ffae5ce89fea41af8d13eca7b4f29daf685406354c761696e5a4bdfb5698468e54a527
   languageName: node
   linkType: hard
 
@@ -8679,12 +8784,18 @@ __metadata:
     "@babel/core": ^7.25.2
     "@babel/preset-env": ^7.25.3
     "@babel/runtime": ^7.25.0
+    "@notifee/react-native": ^9.1.8
+    "@react-native-async-storage/async-storage": ^3.1.1
     "@react-native-community/cli": 20.0.0
     "@react-native-community/cli-platform-android": 20.0.0
     "@react-native-community/netinfo": ^12.0.1
     "@react-native-documents/picker": ^12.0.1
     "@react-native-firebase/app": ^24.1.1
+    "@react-native-firebase/auth": ^24.1.1
     "@react-native-firebase/crashlytics": ^24.1.1
+    "@react-native-firebase/firestore": ^24.1.1
+    "@react-native-firebase/messaging": ^24.1.1
+    "@react-native-firebase/storage": ^24.1.1
     "@react-native/babel-preset": 0.83.1
     "@react-native/eslint-config": 0.83.1
     "@react-native/metro-config": 0.83.1
@@ -9737,6 +9848,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webidl-conversions@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "webidl-conversions@npm:5.0.0"
+  checksum: ccf1ec2ca7c0b5671e5440ace4a66806ae09c49016ab821481bec0c05b1b82695082dc0a27d1fe9d804d475a408ba0c691e6803fd21be608e710955d4589cd69
+  languageName: node
+  linkType: hard
+
 "websocket-driver@npm:>=0.5.1":
   version: 0.7.5
   resolution: "websocket-driver@npm:0.7.5"
@@ -9759,6 +9877,17 @@ __metadata:
   version: 3.6.20
   resolution: "whatwg-fetch@npm:3.6.20"
   checksum: c58851ea2c4efe5c2235f13450f426824cf0253c1d45da28f45900290ae602a20aff2ab43346f16ec58917d5562e159cd691efa368354b2e82918c2146a519c5
+  languageName: node
+  linkType: hard
+
+"whatwg-url-without-unicode@npm:8.0.0-3":
+  version: 8.0.0-3
+  resolution: "whatwg-url-without-unicode@npm:8.0.0-3"
+  dependencies:
+    buffer: ^5.4.3
+    punycode: ^2.1.1
+    webidl-conversions: ^5.0.0
+  checksum: 1fe266f7161e0bd961087c1254a5a59d1138c3d402064495eed65e7590d9caed5a1d9acfd6e7a1b0bf0431253b0e637ee3e4ffc08387cd60e0b2ddb9d4687a4b
   languageName: node
   linkType: hard
 
@@ -9919,6 +10048,13 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 3f32457a6019e6875cc0c2a037d4b4789da22a55b7be278e78845ec7614d28eaab9b36994cfdf9a18a48fe02f11c496168354b96b6ce202f65fe414cdf96f08c
+  languageName: node
+  linkType: hard
+
+"xmlbuilder@npm:^15.1.1":
+  version: 15.1.1
+  resolution: "xmlbuilder@npm:15.1.1"
+  checksum: 14f7302402e28d1f32823583d121594a9dca36408d40320b33f598bd589ca5163a352d076489c9c64d2dc1da19a790926a07bf4191275330d4de2b0d85bb1843
   languageName: node
   linkType: hard
 

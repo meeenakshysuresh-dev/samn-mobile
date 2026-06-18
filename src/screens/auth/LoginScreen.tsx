@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Pressable } from 'react-native';
-import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AppButton, AppInput, AppText, AppView } from '../../components';
-import type { AuthStackParamList, RootStackParamList } from '../../navigation/RootNavigator.types';
+import { useAuth } from '../../hooks/useAuth';
+import { useLoaderStore } from '../../hooks/useLoaderStore';
+import type { AuthStackParamList } from '../../navigation/RootNavigator.types';
+import { validateLoginForm } from '../../utils/authValidation';
 import { authColors, authStyles } from './authStyles';
 import { AuthFormField } from './AuthFormField';
 import { AuthScreenLayout } from './AuthScreenLayout';
@@ -13,12 +16,36 @@ type Nav = NativeStackNavigationProp<AuthStackParamList, 'Login'>;
 
 export const LoginScreen = () => {
   const navigation = useNavigation<Nav>();
-  const rootNavigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { signIn, error, clearError, authLoading } = useAuth();
+  const loader = useLoaderStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fieldError, setFieldError] = useState<string | null>(null);
+
+  const handleLogin = async () => {
+    clearError();
+    setFieldError(null);
+
+    const validation = validateLoginForm({ email, password });
+    if (!validation.valid) {
+      setFieldError(validation.error ?? 'Invalid input.');
+      return;
+    }
+
+    loader.show();
+    try {
+      await signIn({ email, password });
+    } catch {
+      // surfaced via context
+    } finally {
+      loader.hide();
+    }
+  };
 
   return (
     <AuthScreenLayout
+      headerTitle="Login"
+      showBack={false}
       footer={
         <AppView style={authStyles.footerRow}>
           <AppText style={authStyles.footerText}>Don&apos;t have an account? </AppText>
@@ -68,17 +95,14 @@ export const LoginScreen = () => {
         </Pressable>
       </AppView>
 
+      {fieldError ? <AppText style={authStyles.formError}>{fieldError}</AppText> : null}
+      {error ? <AppText style={authStyles.formError}>{error}</AppText> : null}
+
       <AppButton
         text="Login"
         preset="primary"
-        onPress={() =>
-          rootNavigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: 'MainTabs' }],
-            }),
-          )
-        }
+        onPress={handleLogin}
+        disabled={authLoading}
         style={authStyles.primaryButton}
         labelPreset="authButtonLabel"
         textWeight="semibold"

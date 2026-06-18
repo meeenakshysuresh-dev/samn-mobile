@@ -2,11 +2,12 @@ import React from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AppIcon, AppView, KeyboardAvoiding } from '../../components';
+import { AppIcon, AppView, CommonHeader, KeyboardAvoiding } from '../../components';
 import { authColors, authStyles } from './authStyles';
 
 type AuthScreenLayoutProps = {
   children: React.ReactNode;
+  headerTitle?: string;
   showBack?: boolean;
   onBack?: () => void;
   footer?: React.ReactNode;
@@ -18,6 +19,7 @@ type AuthScreenLayoutProps = {
 
 export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
   children,
+  headerTitle,
   showBack = false,
   onBack,
   footer,
@@ -41,7 +43,7 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
 
   const body = (
     <AppView style={authStyles.pageBody}>
-      {showBack && onBack ? (
+      {!headerTitle && showBack && onBack ? (
         <AppView style={authStyles.topBar}>
           <Pressable
             onPress={onBack}
@@ -61,20 +63,34 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
   );
 
   return (
-    <SafeAreaView style={authStyles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
-      <KeyboardAvoiding style={authStyles.flex}>
-        {scrollable ? (
-          <ScrollView
-            contentContainerStyle={authStyles.scrollContent}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {body}
-          </ScrollView>
-        ) : (
-          <AppView style={[authStyles.scrollContent, authStyles.flex]}>{body}</AppView>
-        )}
-      </KeyboardAvoiding>
-    </SafeAreaView>
+    <AppView style={authStyles.flex}>
+      {headerTitle ? (
+        <CommonHeader
+          title={headerTitle}
+          onBack={onBack}
+          showBackButton={showBack}
+          safeArea
+        />
+      ) : null}
+
+      <SafeAreaView
+        style={authStyles.safeArea}
+        edges={headerTitle ? ['bottom', 'left', 'right'] : ['top', 'bottom', 'left', 'right']}
+      >
+        <KeyboardAvoiding style={authStyles.flex}>
+          {scrollable ? (
+            <ScrollView
+              contentContainerStyle={authStyles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              {body}
+            </ScrollView>
+          ) : (
+            <AppView style={[authStyles.scrollContent, authStyles.flex]}>{body}</AppView>
+          )}
+        </KeyboardAvoiding>
+      </SafeAreaView>
+    </AppView>
   );
 };

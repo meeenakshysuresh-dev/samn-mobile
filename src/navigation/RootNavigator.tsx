@@ -4,8 +4,12 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { AuthNavigator } from '../screens/auth';
+import { CompleteProfileScreen } from '../screens/auth/CompleteProfileScreen';
+import { EmailVerificationScreen } from '../screens/auth/EmailVerificationScreen';
+import { AuthNavigationBridge, SplashScreen } from '../screens/auth/SplashScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
 import { DashboardScreen } from '../screens/home/DashboardScreen';
+import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { UploadDetailsScreen } from '../screens/uploads/UploadDetailsScreen';
@@ -33,6 +37,7 @@ const SettingsStack = createNativeStackNavigator<SettingsStackParamList>();
 const HomeStackNavigator = () => (
   <HomeStack.Navigator screenOptions={{ headerShown: false }}>
     <HomeStack.Screen name="Dashboard" component={DashboardScreen} />
+    <HomeStack.Screen name="Notifications" component={NotificationsScreen} />
   </HomeStack.Navigator>
 );
 
@@ -81,9 +86,19 @@ const MainTabs = () => {
 };
 
 export const RootNavigator = () => (
-  <RootStack.Navigator initialRouteName="Auth" screenOptions={{ headerShown: false }}>
-    <RootStack.Screen name="Auth" component={AuthNavigator} />
-    <RootStack.Screen name="MainTabs" component={MainTabs} />
-    <RootStack.Screen name="UploadDetails" component={UploadDetailsScreen} options={{ title: 'Upload Details' }} />
-  </RootStack.Navigator>
+  <>
+    <AuthNavigationBridge />
+    <RootStack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
+      <RootStack.Screen name="Splash" component={SplashScreen} />
+      <RootStack.Screen name="Auth" component={AuthNavigator} />
+      <RootStack.Screen name="EmailVerification" component={EmailVerificationScreen} />
+      <RootStack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
+      <RootStack.Screen name="MainTabs" component={MainTabs} />
+      <RootStack.Screen
+        name="UploadDetails"
+        component={UploadDetailsScreen}
+        options={{ title: 'Upload Details' }}
+      />
+    </RootStack.Navigator>
+  </>
 );

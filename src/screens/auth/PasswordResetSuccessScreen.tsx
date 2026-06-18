@@ -23,7 +23,7 @@ export const PasswordResetSuccessScreen = () => {
   };
 
   return (
-    <AuthScreenLayout scrollable={false} centered centerForm={false}>
+    <AuthScreenLayout headerTitle="Password Reset" showBack={false} scrollable={false} centered centerForm={false}>
       <AppView style={authStyles.centeredHeader}>
         <AppView style={authStyles.successIconWrap}>
           <AppIcon name="check" width={40} height={40} color={brand.primary} />
