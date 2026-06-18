@@ -57,8 +57,8 @@ export const IconRegistry = {
 
   tabHomeActive: vector('ion', 'home'),
   tabHomeInactive: vector('ion', 'home-outline'),
-  tabCreateActive: vector('ion', 'add-circle'),
-  tabCreateInactive: vector('ion', 'add-circle-outline'),
+  tabTaskActive: vector('materialCommunity', 'format-list-checks'),
+  tabTaskInactive: vector('materialCommunity', 'format-list-checkbox'),
   tabChatActive: vector('ion', 'chatbubble'),
   tabChatInactive: vector('ion', 'chatbubble-outline'),
   tabProfileActive: vector('ion', 'person'),
@@ -70,6 +70,13 @@ export const IconRegistry = {
   close: vector('ion', 'close'),
   checkmark: vector('ion', 'checkmark'),
   alert: vector('ion', 'alert-circle-outline'),
+  star: vector('feather', 'star'),
+  shield: vector('feather', 'shield'),
+  fileText: vector('feather', 'file-text'),
+  globe: vector('feather', 'globe'),
+  messageCircle: vector('feather', 'message-circle'),
+  calendar: vector('feather', 'calendar'),
+  dollarSign: vector('feather', 'dollar-sign'),
 } as const;
 
 export type IconName = keyof typeof IconRegistry;

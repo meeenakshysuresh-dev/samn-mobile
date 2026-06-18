@@ -1,46 +1,53 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { Screen } from '../../components/Screen';
+import { AppText, AppView, CommonHeader } from '../../components';
+import { exitRootScreen } from '../../navigation/stackNavigation';
 import type { RootStackParamList } from '../../navigation';
 import { useAppTheme } from '../../theme/useAppTheme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UploadDetails'>;
+type Nav = NativeStackNavigationProp<RootStackParamList, 'UploadDetails'>;
 
 export const UploadDetailsScreen = ({ route }: Props) => {
-  const { colors } = useAppTheme();
+  const navigation = useNavigation<Nav>();
+  const { theme } = useAppTheme();
 
   return (
-    <Screen>
-      <Text style={[styles.title, { color: colors.text }]}>Upload Complete</Text>
-      <View style={[styles.panel, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.label, { color: colors.mutedText }]}>Upload ID</Text>
-        <Text style={[styles.value, { color: colors.text }]}>{route.params.uploadId}</Text>
+    <AppView style={[styles.container, { backgroundColor: theme.background }]}>
+      <CommonHeader title="Upload Details" onBack={() => exitRootScreen(navigation)} safeArea={false} />
+      <View style={styles.content}>
+        <AppText preset="heading2" style={{ color: theme.textPrimary, marginBottom: 20 }}>
+          Upload Complete
+        </AppText>
+        <View style={[styles.panel, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <AppText preset="caption" style={{ color: theme.textSecondary }}>
+            Upload ID
+          </AppText>
+          <AppText preset="body" weight="semibold" style={{ color: theme.textPrimary, marginTop: 6 }}>
+            {route.params.uploadId}
+          </AppText>
+        </View>
       </View>
-    </Screen>
+    </AppView>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: 20,
-    fontSize: 26,
-    fontWeight: '800',
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   panel: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 16,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-  },
-  value: {
-    marginTop: 6,
-    fontSize: 18,
-    fontWeight: '700',
   },
 });

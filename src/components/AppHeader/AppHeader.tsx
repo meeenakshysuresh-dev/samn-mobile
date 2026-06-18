@@ -1,13 +1,11 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import {
-  Platform,
   Pressable,
-  StatusBar,
   TouchableOpacity,
   View,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useIsRTL } from '../../hooks/useIsRTL';
@@ -19,47 +17,28 @@ import { AppView } from '../AppView';
 import { createAppHeaderStyles } from './styles';
 import type { AppHeaderProps } from './types';
 
-const useGradientHeaderStatusBar = (headerColor: string) => {
-  const theme = useThemeStore(state => state.theme);
-
-  useFocusEffect(
-    useCallback(() => {
-      StatusBar.setBarStyle('light-content');
-      if (Platform.OS === 'android') {
-        StatusBar.setBackgroundColor(headerColor);
-        StatusBar.setTranslucent(true);
-      }
-      return () => {
-        StatusBar.setBarStyle(theme.statusBarStyle);
-        if (Platform.OS === 'android') {
-          StatusBar.setBackgroundColor(theme.statusBar);
-          StatusBar.setTranslucent(false);
-        }
-      };
-    }, [headerColor, theme.statusBar, theme.statusBarStyle]),
-  );
-};
-
-const IconButton = ({
+const HeaderIconButton = ({
   icon,
   onPress,
   color,
   accessibilityLabel,
+  pillStyle,
 }: {
   icon: string;
   onPress?: () => void;
   color?: string;
   accessibilityLabel?: string;
+  pillStyle?: object;
 }) => (
-  <AppIcon
-    name={icon}
-    size="md"
-    color={color}
-    pressable
+  <TouchableOpacity
+    style={pillStyle}
     onPress={onPress}
+    disabled={!onPress}
+    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     accessibilityLabel={accessibilityLabel}
-    style={{ width: 40, height: 40, justifyContent: 'center', alignItems: 'center' }}
-  />
+  >
+    <AppIcon name={icon} size="md" color={color} />
+  </TouchableOpacity>
 );
 
 type GradientHeaderProps = {
@@ -71,7 +50,11 @@ type GradientHeaderProps = {
   onScan?: () => void;
   onEdit?: () => void;
   onMore?: () => void;
+  rightIcon?: string;
+  onRightPress?: () => void;
+  rightBadgeCount?: number;
   rightContent?: React.ReactNode;
+  greetingTitle?: boolean;
   safeArea?: boolean;
 };
 
@@ -82,7 +65,13 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
   showBackButton = true,
   onSearch,
   onScan,
+  onEdit,
   onMore,
+  rightIcon,
+  onRightPress,
+  rightBadgeCount = 0,
+  rightContent,
+  greetingTitle = false,
   safeArea = true,
 }) => {
   const insets = useSafeAreaInsets();
@@ -99,13 +88,14 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
     }
   };
 
-  const topPadding = safeArea ? Math.max(insets.top, headerTokens.minTopInset) : 0;
+  const topPadding = Math.max(
+    insets.top,
+    safeArea ? headerTokens.minTopInset : headerTokens.dashboardTopPadding,
+  );
   const gradColors =
     Array.isArray(theme.gradientHeader) && theme.gradientHeader.length > 0
       ? [...theme.gradientHeader]
       : [theme.primaryDark, theme.primary];
-
-  useGradientHeaderStatusBar(theme.headerStatusBar);
 
   return (
     <LinearGradient colors={gradColors} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.gradientHeader}>
@@ -136,8 +126,11 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
           >
             {title ? (
               <AppText
-                preset="headerTitle"
-                style={[styles.gsHeaderTitle, { textAlign: isRTL ? 'right' : 'left' }]}
+                preset={greetingTitle ? 'headerGreeting' : 'headerTitle'}
+                style={[
+                  greetingTitle ? styles.greeting : styles.gsHeaderTitle,
+                  { textAlign: isRTL ? 'right' : 'left' },
+                ]}
               >
                 {title}
               </AppText>
@@ -147,6 +140,7 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
                 preset="headerSubtitle"
                 style={[
                   styles.subtitleText,
+                  greetingTitle ? styles.subGreeting : null,
                   {
                     marginTop: 2,
                     textAlign: isRTL ? 'right' : 'left',
@@ -160,14 +154,42 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
           </AppView>
 
           <AppView style={styles.actions}>
+            {rightContent}
+            {rightIcon && onRightPress ? (
+              <View style={{ position: 'relative' }}>
+                <HeaderIconButton
+                  icon={rightIcon}
+                  onPress={onRightPress}
+                  color={theme.headerText}
+                  accessibilityLabel={rightIcon === 'bell' ? 'Notifications' : 'Edit profile'}
+                  pillStyle={styles.gsBackBtnPill}
+                />
+                {rightBadgeCount > 0 ? (
+                  <View style={[styles.headerBadge, { backgroundColor: theme.error }]}>
+                    <AppText preset="caption" weight="bold" style={{ color: theme.headerText, fontSize: 10 }}>
+                      {rightBadgeCount > 9 ? '9+' : rightBadgeCount}
+                    </AppText>
+                  </View>
+                ) : null}
+              </View>
+            ) : null}
+            {onEdit ? (
+              <HeaderIconButton
+                icon="edit"
+                onPress={onEdit}
+                color={theme.headerText}
+                accessibilityLabel="Edit"
+                pillStyle={styles.gsBackBtnPill}
+              />
+            ) : null}
             {onSearch ? (
-              <IconButton icon="search" onPress={onSearch} color={theme.headerText} accessibilityLabel="Search" />
+              <HeaderIconButton icon="search" onPress={onSearch} color={theme.headerText} accessibilityLabel="Search" pillStyle={styles.gsBackBtnPill} />
             ) : null}
             {onScan ? (
-              <IconButton icon="tabQrCode" onPress={onScan} color={theme.headerText} accessibilityLabel="Scan" />
+              <HeaderIconButton icon="tabQrCode" onPress={onScan} color={theme.headerText} accessibilityLabel="Scan" pillStyle={styles.gsBackBtnPill} />
             ) : null}
             {onMore ? (
-              <IconButton icon="menu" onPress={onMore} color={theme.headerText} accessibilityLabel="More options" />
+              <HeaderIconButton icon="menu" onPress={onMore} color={theme.headerText} accessibilityLabel="More options" pillStyle={styles.gsBackBtnPill} />
             ) : null}
           </AppView>
         </AppView>
@@ -196,13 +218,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const isRTL = useIsRTL();
   const styles = createAppHeaderStyles(theme, isRTL);
 
-  const topPadding = safeArea ? Math.max(insets.top, headerTokens.minTopInset) : headerTokens.dashboardTopPadding;
+  const topPadding = Math.max(
+    insets.top,
+    safeArea ? headerTokens.minTopInset : headerTokens.dashboardTopPadding,
+  );
   const gradColors =
     Array.isArray(theme.gradientHeader) && theme.gradientHeader.length > 0
       ? [...theme.gradientHeader]
       : [theme.primaryDark, theme.primary];
-
-  useGradientHeaderStatusBar(theme.headerStatusBar);
 
   const displayName = user?.name?.trim() || 'Guest';
   const greetingText = `Hello, ${displayName}`;
@@ -232,21 +255,23 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </AppText>
           </AppView>
 
-          <AppView style={styles.actions}>
+          <AppView style={[styles.actions, { gap: 8 }]}>
             {onNotification ? (
-              <IconButton
+              <HeaderIconButton
                 icon="bell"
                 onPress={onNotification}
                 color={theme.headerText}
                 accessibilityLabel="Notifications"
+                pillStyle={styles.gsBackBtnPill}
               />
             ) : null}
             {onSettings ? (
-              <IconButton
+              <HeaderIconButton
                 icon="settings"
                 onPress={onSettings}
                 color={theme.headerText}
                 accessibilityLabel="Settings"
+                pillStyle={styles.gsBackBtnPill}
               />
             ) : null}
           </AppView>

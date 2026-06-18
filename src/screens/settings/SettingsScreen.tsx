@@ -1,15 +1,25 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppSwitch, AppText, CommonHeader, Screen } from '../../components';
+import { AppSwitch, AppText, AppView, CommonHeader } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
+import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
+import { useUnreadNotificationCount } from '../../hooks/useNotificationStore';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
 import { useSettingsStore } from '../../hooks/useSettingsStore';
+import { navigateToHomeStack, navigateToSettingsStack } from '../../navigation/stackNavigation';
+import { useTabBarInset, TAB_BAR_DEFAULT_INSET } from '../../navigation/tabBarLayout';
+import type { SettingsStackParamList } from '../../navigation/RootNavigator.types';
 import {
   registerDeviceToken,
   requestPushPermission,
 } from '../../services/notification.service';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { SettingsMenuRow } from './SettingsMenuRow';
+
+type Nav = NativeStackNavigationProp<SettingsStackParamList, 'Settings'>;
 
 type SettingsRowProps = {
   label: string;
@@ -40,13 +50,18 @@ const SettingsRow = ({ label, description, value, onChange, disabled }: Settings
 };
 
 export const SettingsScreen = () => {
+  const navigation = useNavigation<Nav>();
   const { theme } = useAppTheme();
+  const tabBarInset = useTabBarInset();
   const { user, userProfile, signOut, authLoading } = useAuth();
   const loader = useLoaderStore();
   const darkModeEnabled = useSettingsStore(state => state.darkModeEnabled);
   const pushNotificationsEnabled = useSettingsStore(state => state.pushNotificationsEnabled);
   const setDarkModeEnabled = useSettingsStore(state => state.setDarkModeEnabled);
   const setPushNotificationsEnabled = useSettingsStore(state => state.setPushNotificationsEnabled);
+  const unreadNotificationCount = useUnreadNotificationCount();
+
+  useConfirmExitOnBack();
 
   const handleSignOut = async () => {
     loader.show();
@@ -70,63 +85,99 @@ export const SettingsScreen = () => {
   };
 
   return (
-    <Screen>
-      <CommonHeader title="Settings" showBackButton={false} safeArea={false} />
-
-      <AppText preset="heading2" style={styles.title}>
-        Settings
-      </AppText>
-      <AppText preset="body" style={{ color: theme.textSecondary, marginBottom: 20 }}>
-        Manage your SAMN account and app preferences.
-      </AppText>
-
-      <View style={[styles.group, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <AppText preset="overline" style={[styles.groupTitle, { color: theme.textSecondary }]}>
-          Account
+    <AppView style={[styles.container, { backgroundColor: theme.background }]}>
+      <CommonHeader
+        title="Settings"
+        showBackButton={false}
+        safeArea={false}
+        rightIcon="bell"
+        rightBadgeCount={unreadNotificationCount}
+        onRightPress={() => navigateToHomeStack(navigation, 'Notifications')}
+      />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(tabBarInset, TAB_BAR_DEFAULT_INSET) + 24 },
+        ]}
+      >
+        <AppText preset="body" style={{ color: theme.textSecondary, marginBottom: 20 }}>
+          Manage your SAMN account and app preferences.
         </AppText>
-        <View style={styles.accountBlock}>
-          <AppText preset="body" weight="semibold" style={{ color: theme.textPrimary }}>
-            {userProfile?.fullName || user?.displayName || 'SAMN User'}
+
+        <View style={[styles.group, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <AppText preset="overline" style={[styles.groupTitle, { color: theme.textSecondary }]}>
+            Preferences
           </AppText>
-          <AppText preset="body" style={{ color: theme.textSecondary, marginTop: 4 }}>
-            {userProfile?.email || user?.email || '—'}
-          </AppText>
+          <SettingsRow
+            label="Dark Mode"
+            description="Use dark theme across the app"
+            value={darkModeEnabled}
+            onChange={setDarkModeEnabled}
+          />
+          <SettingsRow
+            label="Push Notifications"
+            description="Receive alerts for account and profile updates"
+            value={pushNotificationsEnabled}
+            onChange={handlePushToggle}
+          />
         </View>
-        <Pressable
-          style={[styles.signOutButton, { borderColor: theme.border }]}
-          onPress={handleSignOut}
-          disabled={authLoading}
-        >
-          <AppText preset="body" weight="semibold" style={{ color: theme.error }}>
-            Sign Out
-          </AppText>
-        </Pressable>
-      </View>
 
-      <View style={[styles.group, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <AppText preset="overline" style={[styles.groupTitle, { color: theme.textSecondary }]}>
-          Preferences
-        </AppText>
-        <SettingsRow
-          label="Dark Mode"
-          description="Use dark theme across the app"
-          value={darkModeEnabled}
-          onChange={setDarkModeEnabled}
-        />
-        <SettingsRow
-          label="Push Notifications"
-          description="Receive alerts for account and profile updates"
-          value={pushNotificationsEnabled}
-          onChange={handlePushToggle}
-        />
-      </View>
-    </Screen>
+        <View style={[styles.group, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <AppText preset="overline" style={[styles.groupTitle, { color: theme.textSecondary }]}>
+            General
+          </AppText>
+          <SettingsMenuRow
+            label="About Us"
+            description="Learn about SAMN"
+            icon="info"
+            onPress={() => navigateToSettingsStack(navigation, 'AboutUs')}
+            showDivider
+          />
+          <SettingsMenuRow
+            label="Help & Support"
+            description="FAQs and contact options"
+            icon="help"
+            onPress={() => navigateToSettingsStack(navigation, 'HelpSupport')}
+            showDivider={false}
+          />
+        </View>
+
+        <View style={[styles.group, { backgroundColor: theme.card, borderColor: theme.border }]}>
+          <AppText preset="overline" style={[styles.groupTitle, { color: theme.textSecondary }]}>
+            Account
+          </AppText>
+          <View style={styles.accountBlock}>
+            <AppText preset="body" weight="semibold" style={{ color: theme.textPrimary }}>
+              {userProfile?.fullName || user?.displayName || 'SAMN User'}
+            </AppText>
+            <AppText preset="body" style={{ color: theme.textSecondary, marginTop: 4 }}>
+              {userProfile?.email || user?.email || '—'}
+            </AppText>
+          </View>
+          <Pressable
+            style={[styles.signOutButton, { borderColor: theme.border }]}
+            onPress={handleSignOut}
+            disabled={authLoading}
+          >
+            <AppText preset="body" weight="semibold" style={{ color: theme.error }}>
+              Sign Out
+            </AppText>
+          </Pressable>
+        </View>
+      </ScrollView>
+    </AppView>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: 8,
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   group: {
     borderWidth: 1,

@@ -50,7 +50,28 @@ export const profileStyles = StyleSheet.create({
   },
   photoSection: {
     alignItems: 'center',
+    paddingTop: spacing.xxl,
     marginBottom: spacing.xxl,
+  },
+  avatarCircle: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: '#D4EBE4',
+    borderWidth: 1,
+    borderColor: profileColors.photoBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+  },
+  avatarInitials: {
+    color: brand.primary,
+    fontFamily: fontFamily.bold,
+    fontSize: normalize(26),
+    lineHeight: normalize(32),
+    letterSpacing: normalize(1),
+    textAlign: 'center',
+    includeFontPadding: false,
   },
   photoFrame: {
     width: profileLayout.photoWidth,

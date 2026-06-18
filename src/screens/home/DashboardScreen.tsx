@@ -1,88 +1,157 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { getApp } from '@react-native-firebase/app';
 import { getCrashlytics, log } from '@react-native-firebase/crashlytics';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppCard, AppText, AppView, DashboardHeader, SectionHeading } from '../../components';
+import { AppText, AppView, CommonHeader, SectionHeading } from '../../components';
+import { TASK_CATEGORIES } from '../../constants/tasks';
 import { useAuth } from '../../hooks/useAuth';
-import { useNetworkStatus } from '../../hooks/useNetworkStatus';
+import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
+import { useUnreadNotificationCount } from '../../hooks/useNotificationStore';
+import { useBrowseableTasks, useTaskError, useTaskLoading } from '../../hooks/useTaskSelectors';
+import { useRefreshTasks } from '../../hooks/useTaskSync';
+import { useTaskUserContext } from '../../hooks/useTaskUserContext';
+import { navigateToCreateStack } from '../../navigation/taskNavigation';
 import { useTabBarInset, TAB_BAR_DEFAULT_INSET } from '../../navigation/tabBarLayout';
 import type { HomeStackParamList } from '../../navigation/RootNavigator.types';
 import { useAppTheme } from '../../theme/useAppTheme';
+import { spacing } from '../../theme/tokens';
+import type { TaskCategory } from '../../types/task.types';
 import { getFirstName } from '../../utils/userName';
+import { CategoryChip } from '../tasks/components/CategoryChip';
+import { QuickActionCard } from '../tasks/components/QuickActionCard';
+import { TaskCard } from '../tasks/components/TaskCard';
 
 type Nav = NativeStackNavigationProp<HomeStackParamList, 'Dashboard'>;
 
 export const DashboardScreen = () => {
-  const { theme, activeScheme } = useAppTheme();
-  const network = useNetworkStatus();
+  const { theme } = useAppTheme();
   const tabBarInset = useTabBarInset();
   const navigation = useNavigation<Nav>();
   const { userProfile, user } = useAuth();
-  const [firebaseAppName, setFirebaseAppName] = useState('default');
+  const unreadNotificationCount = useUnreadNotificationCount();
+  const { userId } = useTaskUserContext();
+  const browseableTasks = useBrowseableTasks(userId);
+  const loading = useTaskLoading();
+  const error = useTaskError();
+  const { refresh, refreshing } = useRefreshTasks();
+  const [selectedCategory, setSelectedCategory] = useState<TaskCategory | null>(null);
 
   const firstName = getFirstName(userProfile?.fullName ?? user?.displayName);
+  const greetingName = firstName === 'there' ? 'Guest' : firstName;
+
+  useConfirmExitOnBack();
 
   useEffect(() => {
     const app = getApp();
-    setFirebaseAppName(app.name);
-    log(getCrashlytics(), 'Dashboard opened');
+    log(getCrashlytics(), `Dashboard opened (${app.name})`);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userId !== 'guest-user') {
+        void refresh(userId);
+      }
+    }, [refresh, userId]),
+  );
+
+  const goPostTask = () => navigateToCreateStack(navigation, 'PostTask');
+  const goBrowseTasks = () => navigateToCreateStack(navigation, 'BrowseTasks');
+  const goTaskDetails = (taskId: string) =>
+    navigateToCreateStack(navigation, 'TaskDetails', { taskId });
+
+  const nearbyTasks = selectedCategory
+    ? browseableTasks.filter(task => task.category === selectedCategory)
+    : browseableTasks;
+
+  const handleRefresh = useCallback(() => {
+    void refresh(userId);
+  }, [refresh, userId]);
 
   return (
     <AppView style={[styles.container, { backgroundColor: theme.background }]}>
-      <DashboardHeader
-        user={{ name: firstName }}
-        onNotification={() => navigation.navigate('Notifications')}
+      <CommonHeader
+        title={`Hello, ${greetingName}`}
+        subtitle="Find help or offer services nearby"
+        greetingTitle
+        showBackButton={false}
         safeArea={false}
+        rightIcon="bell"
+        rightBadgeCount={unreadNotificationCount}
+        onRightPress={() => navigation.navigate('Notifications')}
       />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={theme.primary}
+            colors={[theme.primary]}
+          />
+        }
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(tabBarInset, TAB_BAR_DEFAULT_INSET) + 16 },
+          { paddingBottom: Math.max(tabBarInset, TAB_BAR_DEFAULT_INSET) + 24 },
         ]}
       >
-        <SectionHeading title="OVERVIEW" />
-        <AppText preset="displaySmall" style={styles.title}>
-          Task Manager
-        </AppText>
-        <AppText preset="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Android React Native app with shared UI foundation, Firebase, network status, and uploads.
-        </AppText>
+        {error ? (
+          <AppText preset="bodySmall" style={{ color: theme.error, marginBottom: spacing.md }}>
+            {error}
+          </AppText>
+        ) : null}
 
-        <AppCard style={styles.panel}>
-          <AppText preset="overline" style={{ color: theme.textSecondary }}>
-            Firebase app
-          </AppText>
-          <AppText preset="heading3" style={{ marginTop: 6 }}>
-            {firebaseAppName}
-          </AppText>
-        </AppCard>
+        <View style={styles.quickActions}>
+          <QuickActionCard label="Post a Task" icon="plus" onPress={goPostTask} />
+          <QuickActionCard label="Browse Tasks" icon="search" onPress={goBrowseTasks} />
+        </View>
 
-        <AppCard style={styles.panel}>
-          <AppText preset="overline" style={{ color: theme.textSecondary }}>
-            Network
-          </AppText>
-          <AppText
-            preset="heading3"
-            style={{ marginTop: 6, color: network.isConnected ? theme.success : theme.error }}
-          >
-            {network.isConnected ? 'Online' : 'Offline'} · {network.type}
-          </AppText>
-        </AppCard>
+        <SectionHeading title="CATEGORIES" />
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categories}
+        >
+          {TASK_CATEGORIES.map(category => (
+            <CategoryChip
+              key={category}
+              label={category}
+              selected={selectedCategory === category}
+              onPress={() =>
+                setSelectedCategory(prev => (prev === category ? null : category))
+              }
+            />
+          ))}
+        </ScrollView>
 
-        <AppCard style={styles.panel}>
-          <AppText preset="overline" style={{ color: theme.textSecondary }}>
-            Theme
+        <SectionHeading title="NEARBY TASKS" />
+        {loading && nearbyTasks.length === 0 ? (
+          <ActivityIndicator color={theme.primary} style={{ marginBottom: spacing.lg }} />
+        ) : nearbyTasks.length === 0 ? (
+          <AppText preset="body" style={{ color: theme.textSecondary, marginBottom: spacing.lg }}>
+            No open tasks nearby right now.
           </AppText>
-          <AppText preset="heading3" style={{ marginTop: 6 }}>
-            {activeScheme}
-          </AppText>
-        </AppCard>
+        ) : (
+          nearbyTasks.slice(0, 5).map(task => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              variant="compact"
+              onPress={() => goTaskDetails(task.id)}
+            />
+          ))
+        )}
+
+        {nearbyTasks.length > 5 ? (
+          <Pressable onPress={goBrowseTasks} style={styles.viewAll}>
+            <AppText preset="body" weight="semibold" style={{ color: theme.primary }}>
+              View all tasks
+            </AppText>
+          </Pressable>
+        ) : null}
       </ScrollView>
     </AppView>
   );
@@ -96,15 +165,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
   },
-  title: {
-    marginBottom: 8,
+  quickActions: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
-  subtitle: {
-    marginBottom: 24,
-    lineHeight: 22,
+  categories: {
+    paddingBottom: spacing.lg,
   },
-  panel: {
-    marginBottom: 14,
-    padding: 16,
+  viewAll: {
+    marginBottom: spacing.lg,
+    alignSelf: 'flex-start',
   },
 });

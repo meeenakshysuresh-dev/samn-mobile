@@ -5,7 +5,7 @@ import type { Asset } from 'react-native-image-picker';
 import type { CompositeScreenProps } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { AppButton, AppText, Screen, SectionHeading, usePhotoPicker } from '../../components';
+import { AppButton, AppText, AppView, CommonHeader, Screen, SectionHeading, usePhotoPicker } from '../../components';
 import type { RootStackParamList, UploadsStackParamList } from '../../navigation';
 import { uploadFile, type UploadFilePart } from '../../services/uploadService';
 import { useAppTheme } from '../../theme/useAppTheme';
@@ -91,16 +91,15 @@ export const UploadsScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <Screen>
-      <SectionHeading title="UPLOADS" />
-      <AppText preset="heading2" style={styles.title}>
-        Uploads
-      </AppText>
-      <AppText preset="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
-        Pick an image from camera or gallery, or choose a document to upload.
-      </AppText>
+    <AppView style={[styles.container, { backgroundColor: theme.background }]}>
+      <CommonHeader title="Task Management" showBackButton={false} safeArea={false} />
+      <Screen>
+        <SectionHeading title="UPLOADS" />
+        <AppText preset="body" style={[styles.subtitle, { color: theme.textSecondary }]}>
+          Pick an image from camera or gallery, or choose a document to upload.
+        </AppText>
 
-      <View style={[styles.panel, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View style={[styles.panel, { backgroundColor: theme.card, borderColor: theme.border }]}>
         <AppButton text="Choose Image" icon="image" disabled={isUploading} onPress={openPhotoPicker} />
         <AppButton text="Choose File" icon="file" disabled={isUploading} onPress={chooseDocument} />
 
@@ -113,13 +112,14 @@ export const UploadsScreen = ({ navigation }: Props) => {
       </View>
 
       {PickerSheet}
-    </Screen>
+      </Screen>
+    </AppView>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    marginBottom: 8,
+  container: {
+    flex: 1,
   },
   subtitle: {
     marginBottom: 22,

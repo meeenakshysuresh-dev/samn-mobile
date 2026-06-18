@@ -19,10 +19,8 @@ const getAuthActionCodeSettings = (): FirebaseAuthTypes.ActionCodeSettings => ({
   },
 });
 
-export const getPasswordResetActionCodeSettings = (): FirebaseAuthTypes.ActionCodeSettings => ({
-  ...getAuthActionCodeSettings(),
-  url: AUTH_CONTINUE_URL,
-});
+export const getPasswordResetActionCodeSettings = (): FirebaseAuthTypes.ActionCodeSettings =>
+  getAuthActionCodeSettings();
 
 export const getEmailVerificationActionCodeSettings = (): FirebaseAuthTypes.ActionCodeSettings =>
   getAuthActionCodeSettings();

@@ -1,3 +1,4 @@
+export { AppStatusBar } from './AppStatusBar/AppStatusBar';
 export { AppButton } from './AppButton';
 export { AppInput, AppTextArea, AppInputPassword } from './AppInput';
 export { AppText } from './AppText';
@@ -10,6 +11,7 @@ export { AppCheckbox } from './AppCheckbox';
 export { AppSwitch } from './AppSwitch';
 export { AppRadioGroup } from './AppRadioGroup';
 export { AppLoader } from './AppLoader';
+export { AppLogo } from './AppLogo';
 export { AppIcon } from './AppIcon';
 export { KeyboardAvoiding } from './KeyboardAvoiding';
 export { Screen } from './Screen';

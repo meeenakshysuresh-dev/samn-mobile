@@ -2,20 +2,91 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // ─── Helpers ───────────────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isUser(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isNotificationUnread() {
+      return !('read' in resource.data) || resource.data.read == false;
+    }
+
+    function isNotificationReadUpdate() {
+      return isNotificationUnread()
+        && request.resource.data.read == true
+        && (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt'])
+        );
+    }
+
+    // ─── users ─────────────────────────────────────────────────────────────
     match /users/{userId} {
-      allow read: if request.auth != null && (
-        request.auth.uid == userId ||
-        resource.data.email == request.auth.token.email
+      allow read: if isUser(userId);
+      allow create: if isUser(userId);
+      allow update: if isUser(userId);
+      allow delete: if isUser(userId);
+    }
+
+    // ─── tasks ─────────────────────────────────────────────────────────────
+    match /tasks/{taskId} {
+      allow read: if isSignedIn();
+
+      allow create: if isSignedIn()
+        && request.resource.data.taskId == taskId
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.ownerName is string
+        && request.resource.data.title is string
+        && request.resource.data.status == 'open';
+
+      // Owner, assigned worker, or user accepting an open task
+      allow update: if isSignedIn() && (
+        resource.data.ownerUid == request.auth.uid
+        || resource.data.acceptedBy == request.auth.uid
+        || (
+          resource.data.status == 'open'
+          && request.resource.data.acceptedBy == request.auth.uid
+        )
       );
 
-      allow create: if request.auth != null && request.auth.uid == userId;
+      allow delete: if isSignedIn()
+        && resource.data.ownerUid == request.auth.uid
+        && resource.data.status == 'open';
+    }
 
-      allow update: if request.auth != null && request.auth.uid == userId;
+    // ─── notifications ─────────────────────────────────────────────────────
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
 
-      allow delete: if request.auth != null && (
-        request.auth.uid == userId ||
-        resource.data.email == request.auth.token.email
-      );
+      // Actor creates alert for owner/worker (e.g. on accept, complete)
+      allow create: if isSignedIn()
+        && request.resource.data.notificationId == notificationId
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.actorName is string
+        && request.resource.data.userId is string
+        && request.resource.data.taskId is string
+        && request.resource.data.eventType is string
+        && request.resource.data.title is string
+        && request.resource.data.body is string
+        && request.resource.data.read != true;
+
+      // Recipient marks read (+ optional readAt timestamp)
+      allow update: if isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && isNotificationReadUpdate();
+
+      allow delete: if false;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

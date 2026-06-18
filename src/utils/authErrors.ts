@@ -17,8 +17,12 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
     'Firebase is not configured for this device. Add your debug SHA-1 fingerprint in Firebase Console, re-download google-services.json, then rebuild the app.',
   'auth/app-not-authorized':
     'This app is not authorized for Firebase. Add SHA-1 fingerprint in Firebase Console for package com.rn_task_manager, then rebuild.',
+  'auth/unauthorized-domain':
+    'This app domain is not authorized in Firebase. Add the domain under Authentication → Settings → Authorized domains, or use the default Firebase auth link.',
   'firestore/permission-denied':
     'Firestore access denied. Publish security rules in Firebase Console (Firestore → Rules) to allow authenticated users to read/write their own profile.',
+  'firestore/invalid-argument':
+    'Invalid profile data was sent to Firestore. Reload the app and try saving again.',
 };
 
 export const getFirebaseAuthErrorMessage = (error: unknown): string => {
@@ -43,6 +47,13 @@ export const getFirebaseAuthErrorMessage = (error: unknown): string => {
 
   if (code === 'firestore/permission-denied' || /permission.denied|permission-denied/i.test(message)) {
     return AUTH_ERROR_MESSAGES['firestore/permission-denied'];
+  }
+
+  if (
+    code === 'firestore/invalid-argument' ||
+    /unsupported field value:\s*undefined/i.test(message)
+  ) {
+    return AUTH_ERROR_MESSAGES['firestore/invalid-argument'];
   }
 
   if (message) {

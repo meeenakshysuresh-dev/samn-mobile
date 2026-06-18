@@ -5,6 +5,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppButton, AppText, AppView } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
+import { exitAuthScreen } from '../../navigation/stackNavigation';
 import type { AuthStackParamList } from '../../navigation/RootNavigator.types';
 import { validateEmail } from '../../utils/authValidation';
 import { authStyles } from './authStyles';
@@ -43,7 +44,7 @@ export const ForgotPasswordScreen = () => {
   };
 
   return (
-    <AuthScreenLayout headerTitle="Forgot Password" showBack onBack={() => navigation.goBack()}>
+    <AuthScreenLayout headerTitle="Forgot Password" showBack onBack={() => exitAuthScreen(navigation)}>
       <AppView style={authStyles.headerBlock}>
         <AppText preset="authCardTitle" style={authStyles.title}>
           Forgot Password?

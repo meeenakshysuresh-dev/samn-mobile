@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
+import { useNotificationSync } from '../hooks/useNotificationSync';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import {
   initializeNotifications,
@@ -13,6 +14,8 @@ export const NotificationBootstrap = () => {
   const { user } = useAuth();
   const pushNotificationsEnabled = useSettingsStore(state => state.pushNotificationsEnabled);
   const hydrated = useSettingsStore(state => state.hydrated);
+
+  useNotificationSync(user?.uid ?? null);
 
   useEffect(() => {
     const unsubscribeEvents = setupNotifeeForegroundEvents();

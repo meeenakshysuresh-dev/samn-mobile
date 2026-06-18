@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import LinearGradient from 'react-native-linear-gradient';
@@ -29,6 +29,7 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
   const activeRoute = state.routes[state.index]?.name as TabKey;
   const inactive = theme.tabBarItemInactive;
   const active = theme.tabBarItemActive;
+  const lastReportedHeightRef = useRef(0);
 
   const navigateTo = (routeName: TabKey) => {
     const selected = activeRoute === routeName;
@@ -81,7 +82,8 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
       style={[styles.tabBar, { paddingBottom: bottomPadding }]}
       onLayout={event => {
         const { height } = event.nativeEvent.layout;
-        if (height > 0) {
+        if (height > 0 && height !== lastReportedHeightRef.current) {
+          lastReportedHeightRef.current = height;
           onHeightChange?.(height);
         }
       }}
@@ -89,10 +91,10 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
       <View style={styles.tabBarRow}>
         <View style={styles.tabBarLeftGroup}>
           {renderTab(
-            'create',
-            'Create',
-            'tabCreateActive',
-            'tabCreateInactive',
+            'task',
+            'Task',
+            'tabTaskActive',
+            'tabTaskInactive',
             activeRoute === 'CreateStack',
             () => navigateTo('CreateStack'),
           )}

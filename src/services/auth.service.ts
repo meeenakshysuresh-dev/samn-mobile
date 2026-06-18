@@ -20,6 +20,7 @@ import {
   updateUserProfile,
 } from './user.service';
 import { notifyRegistrationSuccess } from './notification.service';
+import { stripUndefined } from '../utils/firestoreHelpers';
 
 const getActiveUser = () => {
   const user = getFirebaseAuth().currentUser;
@@ -126,8 +127,12 @@ export const signOutUser = async () => {
 };
 
 export const completeUserProfile = async (uid: string, phone?: string) => {
-  await updateUserProfile(uid, {
-    phone: phone?.trim() || undefined,
-    profileCompleted: true,
-  });
+  const trimmedPhone = phone?.trim();
+  await updateUserProfile(
+    uid,
+    stripUndefined({
+      ...(trimmedPhone ? { phone: trimmedPhone } : {}),
+      profileCompleted: true,
+    }),
+  );
 };

@@ -3,6 +3,7 @@ import { Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppIcon, AppView, CommonHeader, KeyboardAvoiding } from '../../components';
+import { useHeaderStatusBar } from '../../hooks/useHeaderStatusBar';
 import { authColors, authStyles } from './authStyles';
 
 type AuthScreenLayoutProps = {
@@ -27,6 +28,8 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
   centered = false,
   centerForm = true,
 }) => {
+  useHeaderStatusBar();
+
   const formBlock = (
     <AppView
       style={
@@ -69,7 +72,7 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
           title={headerTitle}
           onBack={onBack}
           showBackButton={showBack}
-          safeArea
+          safeArea={false}
         />
       ) : null}
 

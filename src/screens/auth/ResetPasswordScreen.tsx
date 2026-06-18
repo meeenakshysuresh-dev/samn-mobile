@@ -6,6 +6,7 @@ import type { RouteProp } from '@react-navigation/native';
 import { AppButton, AppText, AppView } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
+import { exitAuthScreen } from '../../navigation/stackNavigation';
 import type { AuthStackParamList } from '../../navigation/RootNavigator.types';
 import { validateConfirmPassword, validatePassword } from '../../utils/authValidation';
 import { authStyles } from './authStyles';
@@ -59,7 +60,7 @@ export const ResetPasswordScreen = () => {
   };
 
   return (
-    <AuthScreenLayout headerTitle="Update Password" showBack onBack={() => navigation.goBack()}>
+    <AuthScreenLayout headerTitle="Update Password" showBack onBack={() => exitAuthScreen(navigation)}>
       <AppView style={authStyles.headerBlock}>
         <AppText preset="authCardTitle" style={authStyles.title}>
           Update Password

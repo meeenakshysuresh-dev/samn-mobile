@@ -12,6 +12,7 @@ import {
 
 import { useNotificationStore } from '../hooks/useNotificationStore';
 import { useSettingsStore } from '../hooks/useSettingsStore';
+import { logError } from '../utils/errorLogger';
 import { updateUserProfile } from './user.service';
 
 export const SAMN_CHANNEL_ID = 'samn_default';
@@ -52,16 +53,10 @@ export const requestPushPermission = async (): Promise<boolean> => {
   );
 };
 
-export const displayLocalNotification = async (
-  title: string,
-  body: string,
-  type: 'registration' | 'profile_updated' | 'push',
-) => {
+export const showLocalPush = async (title: string, body: string) => {
   if (!canDisplayNotifications()) {
     return;
   }
-
-  useNotificationStore.getState().addNotification({ title, body, type });
 
   await createDefaultChannel();
   await notifee.displayNotification({
@@ -73,6 +68,27 @@ export const displayLocalNotification = async (
       smallIcon: 'ic_launcher',
     },
   });
+};
+
+export const displayLocalNotification = async (
+  title: string,
+  body: string,
+  type: 'registration' | 'profile_updated' | 'push' | 'task',
+  options?: { id?: string; taskId?: string },
+) => {
+  if (!canDisplayNotifications()) {
+    return;
+  }
+
+  useNotificationStore.getState().addNotification({
+    id: options?.id,
+    title,
+    body,
+    type,
+    taskId: options?.taskId,
+  });
+
+  await showLocalPush(title, body);
 };
 
 export const notifyRegistrationSuccess = async (fullName?: string) => {
@@ -105,7 +121,11 @@ export const registerDeviceToken = async (uid: string) => {
 
   const token = await getToken(getMessaging());
   if (token) {
-    await updateUserProfile(uid, { fcmToken: token });
+    try {
+      await updateUserProfile(uid, { fcmToken: token });
+    } catch (error) {
+      logError('registerDeviceToken', error, { uid });
+    }
   }
 };
 
@@ -126,7 +146,11 @@ export const initializeNotifications = async (uid?: string | null) => {
 
   return onTokenRefresh(getMessaging(), async token => {
     if (uid && token) {
-      await updateUserProfile(uid, { fcmToken: token });
+      try {
+        await updateUserProfile(uid, { fcmToken: token });
+      } catch (error) {
+        logError('onTokenRefresh', error, { uid });
+      }
     }
   });
 };

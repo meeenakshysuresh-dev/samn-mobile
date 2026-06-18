@@ -8,8 +8,8 @@ export const FIREBASE_PROJECT_ID = 'samn-mobile';
 export const APP_NAME = 'SAMN';
 
 /**
- * Deep link / App Link base used in Firebase ActionCodeSettings.
- * Configure the same host in AndroidManifest and Firebase console authorized domains.
+ * Custom continue URL for future App Links (requires samn.app in Firebase authorized domains).
+ * Password reset & verification emails use FIREBASE_AUTH_ACTION_URL instead.
  */
 export const AUTH_LINK_HOST = 'samn.app';
 export const AUTH_LINK_PATH = '/auth';
@@ -28,6 +28,8 @@ export const AUTH_DEEP_LINK_PREFIXES = [
 
 export const FIRESTORE_COLLECTIONS = {
   users: 'users',
+  tasks: 'tasks',
+  notifications: 'notifications',
 } as const;
 
 export const STORAGE_PATHS = {

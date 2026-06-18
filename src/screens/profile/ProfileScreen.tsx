@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  Image,
+  // Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,25 +10,28 @@ import {
 } from 'react-native';
 
 import {
-  AppButton,
   AppIcon,
   AppText,
   AppView,
   CommonHeader,
 } from '../../components';
-import { usePhotoPicker } from '../../components/PhotoPicker/usePhotoPicker';
+// Image upload temporarily disabled
+// import { usePhotoPicker } from '../../components/PhotoPicker/usePhotoPicker';
 import { useAuth } from '../../hooks/useAuth';
+import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
 import { useTabBarInset } from '../../navigation/tabBarLayout';
-import { brand } from '../../theme/tokens';
+import { brand, fontFamily, spacing } from '../../theme/tokens';
 import { ProfileFormField } from './ProfileFormField';
 import { profileColors, profileStyles } from './profileStyles';
+import { getInitials } from '../../utils/userName';
+import { hasSkill, normalizeSkills } from '../../utils/skills';
 
 const mapProfileToForm = (profile: ReturnType<typeof useAuth>['userProfile']) => ({
   fullName: profile?.fullName ?? '',
   college: profile?.college ?? '',
   department: profile?.department ?? '',
-  skills: profile?.skills ?? [],
+  skills: normalizeSkills(profile?.skills),
   aboutMe: profile?.aboutMe ?? '',
   photoUrl: profile?.photoUrl ?? '',
 });
@@ -47,7 +50,8 @@ export const ProfileScreen = () => {
   const [photoUri, setPhotoUri] = useState('');
   const [skillDraft, setSkillDraft] = useState('');
   const [isAddingSkill, setIsAddingSkill] = useState(false);
-  const [localMessage, setLocalMessage] = useState<string | null>(null);
+
+  useConfirmExitOnBack({ enabled: !isEditing });
 
   const resetFormFromProfile = useCallback(() => {
     const form = mapProfileToForm(userProfile);
@@ -62,17 +66,33 @@ export const ProfileScreen = () => {
   }, [user?.displayName, userProfile]);
 
   useEffect(() => {
+    if (isEditing) {
+      return;
+    }
     resetFormFromProfile();
-  }, [resetFormFromProfile]);
+  }, [
+    isEditing,
+    resetFormFromProfile,
+    user?.displayName,
+    user?.uid,
+    userProfile?.aboutMe,
+    userProfile?.college,
+    userProfile?.department,
+    userProfile?.fullName,
+    userProfile?.photoUrl,
+    userProfile?.skills,
+    userProfile?.uid,
+  ]);
 
-  const photoPicker = usePhotoPicker({
-    onPicked: result => {
-      const uri = result.asset.uri;
-      if (uri) {
-        setPhotoUri(uri);
-      }
-    },
-  });
+  // Image upload temporarily disabled
+  // const photoPicker = usePhotoPicker({
+  //   onPicked: result => {
+  //     const uri = result.asset.uri;
+  //     if (uri) {
+  //       setPhotoUri(uri);
+  //     }
+  //   },
+  // });
 
   const addSkill = useCallback(() => {
     const trimmed = skillDraft.trim();
@@ -82,34 +102,31 @@ export const ProfileScreen = () => {
       return;
     }
 
-    if (!skills.includes(trimmed)) {
+    if (!hasSkill(skills, trimmed)) {
       setSkills(current => [...current, trimmed]);
     }
     setSkillDraft('');
     setIsAddingSkill(false);
   }, [skillDraft, skills]);
 
-  const removeSkill = useCallback((skill: string) => {
-    setSkills(current => current.filter(item => item !== skill));
+  const removeSkill = useCallback((index: number) => {
+    setSkills(current => current.filter((_, itemIndex) => itemIndex !== index));
   }, []);
 
-  const handleEdit = () => {
+  const handleEdit = useCallback(() => {
     clearError();
-    setLocalMessage(null);
     resetFormFromProfile();
     setIsEditing(true);
-  };
+  }, [clearError, resetFormFromProfile]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     clearError();
-    setLocalMessage(null);
     resetFormFromProfile();
     setIsEditing(false);
-  };
+  }, [clearError, resetFormFromProfile]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     clearError();
-    setLocalMessage(null);
     loader.show();
 
     try {
@@ -117,22 +134,40 @@ export const ProfileScreen = () => {
         fullName: fullName.trim(),
         college: college.trim(),
         department: department.trim(),
-        skills,
+        skills: normalizeSkills(skills),
         aboutMe: aboutMe.trim(),
-        photoUrl: photoUri.trim() || undefined,
+        ...(userProfile?.photoUrl ? { photoUrl: userProfile.photoUrl } : {}),
       });
-      setLocalMessage('Profile saved successfully.');
       setIsEditing(false);
     } catch {
       // surfaced via auth context
     } finally {
       loader.hide();
     }
-  };
+  }, [
+    aboutMe,
+    clearError,
+    college,
+    department,
+    fullName,
+    loader,
+    saveProfileDetails,
+    skills,
+    userProfile?.photoUrl,
+  ]);
+
+  const displayName = fullName.trim() || userProfile?.fullName || user?.displayName || '';
+  const initials = getInitials(displayName);
 
   return (
     <AppView style={profileStyles.screen}>
-      <CommonHeader title="Profile" showBackButton={false} safeArea />
+      <CommonHeader
+        title={isEditing ? 'Edit Profile' : 'Profile Details'}
+        showBackButton={false}
+        safeArea={false}
+        rightIcon={isEditing ? undefined : 'edit'}
+        onRightPress={isEditing ? undefined : handleEdit}
+      />
 
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -147,25 +182,36 @@ export const ProfileScreen = () => {
           ]}
         >
           <AppView style={profileStyles.photoSection}>
-            <AppView style={profileStyles.photoFrame}>
-              {photoUri ? (
-                <Image source={{ uri: photoUri }} style={profileStyles.photoImage} resizeMode="cover" />
-              ) : (
-                <AppView style={profileStyles.photoPlaceholder}>
-                  <AppIcon name="user" width={40} height={40} color={brand.primary} />
-                </AppView>
-              )}
-              {isEditing ? (
-                <Pressable style={profileStyles.photoEditButton} onPress={photoPicker.open}>
-                  <AppIcon name="camera" width={16} height={16} color="#FFFFFF" />
-                </Pressable>
-              ) : null}
+            <AppView style={profileStyles.avatarCircle}>
+              <AppText
+                style={profileStyles.avatarInitials}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+              >
+                {initials || '?'}
+              </AppText>
             </AppView>
+            {/* Image upload temporarily disabled
+            {photoUri ? (
+              <Image source={{ uri: photoUri }} style={profileStyles.photoImage} resizeMode="cover" />
+            ) : (
+              <AppView style={profileStyles.photoPlaceholder}>
+                <AppIcon name="user" width={40} height={40} color={brand.primary} />
+              </AppView>
+            )}
+            {isEditing ? (
+              <Pressable style={profileStyles.photoEditButton} onPress={photoPicker.open}>
+                <AppIcon name="camera" width={16} height={16} color="#FFFFFF" />
+              </Pressable>
+            ) : null}
             {isEditing ? (
               <Pressable onPress={photoPicker.open}>
                 <AppText style={profileStyles.changePhotoLink}>Change Photo</AppText>
               </Pressable>
             ) : null}
+            {isEditing ? photoPicker.PickerSheet : null}
+            */}
           </AppView>
 
           <ProfileFormField
@@ -198,14 +244,18 @@ export const ProfileScreen = () => {
           <AppView style={profileStyles.fieldSpacing}>
             <AppText style={profileStyles.fieldLabel}>Skills</AppText>
             <AppView style={profileStyles.skillsRow}>
-              {skills.map(skill =>
+              {skills.map((skill, index) =>
                 isEditing ? (
-                  <Pressable key={skill} style={profileStyles.skillChip} onPress={() => removeSkill(skill)}>
+                  <Pressable
+                    key={`skill-${index}`}
+                    style={profileStyles.skillChip}
+                    onPress={() => removeSkill(index)}
+                  >
                     <AppText style={profileStyles.skillChipText}>{skill}</AppText>
                     <AppIcon name="x" width={12} height={12} color={brand.primary} />
                   </Pressable>
                 ) : (
-                  <AppView key={skill} style={profileStyles.skillChip}>
+                  <AppView key={`skill-${index}`} style={profileStyles.skillChip}>
                     <AppText style={profileStyles.skillChipText}>{skill}</AppText>
                   </AppView>
                 ),
@@ -270,45 +320,29 @@ export const ProfileScreen = () => {
           {error ? (
             <AppText style={[profileStyles.formMessage, profileStyles.formError]}>{error}</AppText>
           ) : null}
-          {localMessage ? (
-            <AppText style={[profileStyles.formMessage, profileStyles.formSuccess]}>{localMessage}</AppText>
-          ) : null}
 
           {isEditing ? (
             <AppView style={styles.actionRow}>
-              <AppButton
-                text="Cancel"
-                preset="secondary"
+              <Pressable
+                style={[styles.halfButton, styles.cancelButton]}
                 onPress={handleCancel}
                 disabled={authLoading}
-                style={styles.actionButton}
-                labelPreset="authButtonLabel"
-                textWeight="semibold"
-              />
-              <AppButton
-                text="Save Profile"
-                preset="primary"
+              >
+                <AppIcon name="x" width={18} height={18} color={brand.primary} />
+                <AppText style={styles.cancelLabel}>Cancel</AppText>
+              </Pressable>
+              <Pressable
+                style={[styles.halfButton, styles.saveButton, authLoading && styles.saveButtonDisabled]}
                 onPress={handleSave}
                 disabled={authLoading}
-                style={styles.actionButton}
-                labelPreset="authButtonLabel"
-                textWeight="semibold"
-              />
+              >
+                <AppIcon name="check" width={18} height={18} color="#FFFFFF" />
+                <AppText style={styles.saveLabel}>Save</AppText>
+              </Pressable>
             </AppView>
-          ) : (
-            <AppButton
-              text="Edit Profile"
-              preset="primary"
-              onPress={handleEdit}
-              style={profileStyles.saveButton}
-              labelPreset="authButtonLabel"
-              textWeight="semibold"
-            />
-          )}
+          ) : null}
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {isEditing ? photoPicker.PickerSheet : null}
     </AppView>
   );
 };
@@ -316,10 +350,42 @@ export const ProfileScreen = () => {
 const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
+    alignItems: 'stretch',
     gap: 12,
-    marginTop: 8,
+    width: '100%',
+    marginTop: spacing.xl,
   },
-  actionButton: {
+  halfButton: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    minHeight: 52,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1.2,
+    borderColor: brand.primary,
+  },
+  cancelLabel: {
+    color: brand.primary,
+    fontFamily: fontFamily.semibold,
+    fontSize: 15,
+  },
+  saveButton: {
+    backgroundColor: brand.primary,
+    borderWidth: 1.2,
+    borderColor: brand.primary,
+  },
+  saveButtonDisabled: {
+    opacity: 0.6,
+  },
+  saveLabel: {
+    color: '#FFFFFF',
+    fontFamily: fontFamily.semibold,
+    fontSize: 15,
   },
 });

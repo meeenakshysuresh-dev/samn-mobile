@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { createThemedStyles } from '../../theme/createThemedStyles';
-import { header as headerTokens } from '../../theme/tokens';
+import { fontFamily, header as headerTokens } from '../../theme/tokens';
 
 export const createAppHeaderStyles = createThemedStyles(
   (theme, isRTL?: boolean) => ({
@@ -105,6 +105,7 @@ export const createAppHeaderStyles = createThemedStyles(
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: headerTokens.rowMarginBottom,
+      minHeight: headerTokens.rowMinHeight,
     },
     gsBackBtnPill: {
       width: headerTokens.iconButtonSize,
@@ -113,6 +114,17 @@ export const createAppHeaderStyles = createThemedStyles(
       backgroundColor: theme.headerActionBg,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    headerBadge: {
+      position: 'absolute',
+      top: -4,
+      right: -4,
+      minWidth: 18,
+      height: 18,
+      borderRadius: 9,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 4,
     },
     gsTitleWrapper: {
       flex: 1,
@@ -353,6 +365,39 @@ export const createAppHeaderStyles = createThemedStyles(
       backgroundColor: 'transparent',
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: 'transparent',
+    },
+    headerPrimaryActionText: {
+      color: theme.primary,
+      fontFamily: fontFamily.semibold,
+      fontSize: 14,
+    },
+    headerActionsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    headerTextAction: {
+      color: theme.headerText,
+      fontFamily: fontFamily.semibold,
+      fontSize: 15,
+      paddingHorizontal: 4,
+      paddingVertical: 6,
+    },
+    headerSaveAction: {
+      backgroundColor: theme.surfacePrimary,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 10,
+      minWidth: 64,
+      alignItems: 'center',
+    },
+    headerSaveActionText: {
+      color: theme.primary,
+      fontFamily: fontFamily.semibold,
+      fontSize: 14,
+    },
+    headerSaveActionDisabled: {
+      opacity: 0.5,
     },
     actionButtonPressed: {
       backgroundColor: theme.surfaceSecondary,

@@ -27,6 +27,8 @@ import { getUserProfile, saveUserProfileDetails, subscribeToUserProfile } from '
 import { notifyProfileUpdated } from '../services/notification.service';
 import type { AuthRouteTarget, LoginInput, RegisterInput, UpdateUserProfileDetailsInput, UserProfile } from '../types/auth.types';
 import { getFirebaseAuthErrorMessage } from '../utils/authErrors';
+import { logError } from '../utils/errorLogger';
+import { pickDefinedFields } from '../utils/firestoreHelpers';
 
 type AuthContextValue = {
   user: FirebaseAuthTypes.User | null;
@@ -50,6 +52,39 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+const isSameProfile = (current: UserProfile | null, next: UserProfile | null): boolean => {
+  if (current === next) {
+    return true;
+  }
+  if (!current || !next) {
+    return false;
+  }
+
+  return (
+    current.uid === next.uid &&
+    current.fullName === next.fullName &&
+    current.email === next.email &&
+    current.emailVerified === next.emailVerified &&
+    current.profileCompleted === next.profileCompleted &&
+    current.phone === next.phone &&
+    current.college === next.college &&
+    current.department === next.department &&
+    current.aboutMe === next.aboutMe &&
+    current.photoUrl === next.photoUrl &&
+    current.fcmToken === next.fcmToken &&
+    current.updatedAt?.seconds === next.updatedAt?.seconds &&
+    current.updatedAt?.nanoseconds === next.updatedAt?.nanoseconds &&
+    JSON.stringify(current.skills ?? []) === JSON.stringify(next.skills ?? [])
+  );
+};
+
+const applyProfileSnapshot = (
+  setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>,
+  profile: UserProfile | null,
+) => {
+  setProfile(current => (isSameProfile(current, profile) ? current : profile));
+};
 
 const handleIncomingUrl = (
   url: string | null,
@@ -121,11 +156,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!isMounted) {
           return;
         }
-        setUserProfile(profile);
+        applyProfileSnapshot(setUserProfile, profile);
 
         profileUnsubscribe = subscribeToUserProfile(
           firebaseUser.uid,
-          setUserProfile,
+          nextProfile => applyProfileSnapshot(setUserProfile, nextProfile),
           () => undefined,
         );
       } catch {
@@ -260,17 +295,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       await runAuthAction(async () => {
-        if (input.fullName?.trim()) {
-          await updateProfile(user, { displayName: input.fullName.trim() });
+        const payload = pickDefinedFields(input, [
+          'fullName',
+          'college',
+          'department',
+          'skills',
+          'aboutMe',
+          'photoUrl',
+          'phone',
+        ]) as UpdateUserProfileDetailsInput;
+
+        if (payload.fullName?.trim()) {
+          try {
+            await updateProfile(user, { displayName: payload.fullName.trim() });
+          } catch (error) {
+            logError('AuthContext.updateProfile', error, { uid: user.uid });
+          }
         }
 
-        await saveUserProfileDetails(user.uid, input);
+        await saveUserProfileDetails(user.uid, payload, {
+          email: user.email ?? userProfile?.email ?? '',
+          fullName: payload.fullName?.trim() || userProfile?.fullName || user.displayName || 'SAMN User',
+          emailVerified: user.emailVerified,
+        });
+
         const profile = await getUserProfile(user.uid);
         setUserProfile(profile);
-        await notifyProfileUpdated();
+
+        try {
+          await notifyProfileUpdated();
+        } catch (error) {
+          logError('AuthContext.notifyProfileUpdated', error, { uid: user.uid });
+        }
       });
     },
-    [runAuthAction, user],
+    [runAuthAction, user, userProfile?.email, userProfile?.fullName],
   );
 
   const value = useMemo<AuthContextValue>(

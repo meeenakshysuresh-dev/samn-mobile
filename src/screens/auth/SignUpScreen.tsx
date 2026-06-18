@@ -6,6 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AppButton, AppText, AppView } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
+import { exitAuthScreen } from '../../navigation/stackNavigation';
 import type { AuthStackParamList } from '../../navigation/RootNavigator.types';
 import { validateRegisterForm } from '../../utils/authValidation';
 import { authStyles } from './authStyles';
@@ -61,7 +62,7 @@ export const SignUpScreen = () => {
     <AuthScreenLayout
       headerTitle="Sign Up"
       showBack
-      onBack={() => navigation.goBack()}
+      onBack={() => exitAuthScreen(navigation)}
       footer={
         <AppView style={authStyles.footerRow}>
           <AppText style={authStyles.footerText}>Already have an account? </AppText>

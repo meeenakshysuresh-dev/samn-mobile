@@ -1,11 +1,12 @@
 import React from 'react';
-import { StatusBar, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppLoader } from './components';
 import { AppBootstrap } from './components/AppBootstrap';
+import { AppStatusBar } from './components/AppStatusBar/AppStatusBar';
 import { AuthProvider } from './contexts/AuthContext';
 import { linkingConfig } from './navigation/linking';
 import { flushPendingNavigation, navigationRef } from './navigation/navigationRef';
@@ -20,11 +21,11 @@ const App = () => {
       <SafeAreaProvider>
         <AuthProvider>
           <AppBootstrap />
+          <AppStatusBar />
           <SafeAreaView
             style={[styles.safeArea, { backgroundColor: theme.background }]}
-            edges={['top', 'left', 'right']}
+            edges={['left', 'right']}
           >
-            <StatusBar barStyle={theme.statusBarStyle} backgroundColor={theme.statusBar} />
             <NavigationContainer
               ref={navigationRef}
               linking={linkingConfig}

@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, AppView } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
+import { useHeaderStatusBar } from '../../hooks/useHeaderStatusBar';
 import { navigationRef, onNavigationReady, resetToRoute } from '../../navigation/navigationRef';
 import type { AuthRouteTarget } from '../../types/auth.types';
 import { brand } from '../../theme/tokens';
@@ -91,18 +94,36 @@ export const AuthNavigationBridge = () => {
 
 export const SplashScreen = () => {
   const theme = useThemeStore(state => state.theme);
+  const insets = useSafeAreaInsets();
+
+  useHeaderStatusBar();
+
+  const gradColors =
+    Array.isArray(theme.gradientHeader) && theme.gradientHeader.length > 0
+      ? [...theme.gradientHeader]
+      : [theme.primaryDark, theme.primary];
 
   return (
-    <AppView
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme.background,
-      }}
-    >
-      <AppText style={authStyles.logo}>SAMN</AppText>
-      <ActivityIndicator size="large" color={brand.primary} style={{ marginTop: 24 }} />
+    <AppView style={{ flex: 1, backgroundColor: theme.background }}>
+      <LinearGradient
+        colors={gradColors}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={{ paddingTop: insets.top }}
+      >
+        <View style={{ height: 4 }} />
+      </LinearGradient>
+      <AppView
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme.background,
+        }}
+      >
+        <AppText style={authStyles.logo}>SAMN</AppText>
+        <ActivityIndicator size="large" color={brand.primary} style={{ marginTop: 24 }} />
+      </AppView>
     </AppView>
   );
 };

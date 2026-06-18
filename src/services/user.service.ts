@@ -15,6 +15,59 @@ import type { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
 import { FIRESTORE_COLLECTIONS } from '../firebase/config';
 import { serverTimestamp, userDocument } from '../firebase/firestore';
 import type { UpdateUserProfileDetailsInput, UserProfile } from '../types/auth.types';
+import { logError } from '../utils/errorLogger';
+import { normalizeSkills } from '../utils/skills';
+import { pickDefinedFields, stripUndefined } from '../utils/firestoreHelpers';
+
+export type SaveUserProfileContext = {
+  email: string;
+  fullName: string;
+  emailVerified?: boolean;
+};
+
+const PROFILE_DETAIL_FIELDS = [
+  'fullName',
+  'college',
+  'department',
+  'skills',
+  'aboutMe',
+  'photoUrl',
+  'phone',
+] as const satisfies readonly (keyof UpdateUserProfileDetailsInput)[];
+
+const buildProfileDetailsPatch = (data: UpdateUserProfileDetailsInput): Record<string, unknown> => {
+  const patch: Record<string, unknown> = {};
+
+  if (data.fullName !== undefined) {
+    patch.fullName = data.fullName.trim();
+  }
+  if (data.college !== undefined) {
+    patch.college = data.college.trim();
+  }
+  if (data.department !== undefined) {
+    patch.department = data.department.trim();
+  }
+  if (data.aboutMe !== undefined) {
+    patch.aboutMe = data.aboutMe.trim();
+  }
+  if (data.skills !== undefined) {
+    patch.skills = normalizeSkills(data.skills);
+  }
+  if (data.phone !== undefined) {
+    const phone = data.phone.trim();
+    if (phone) {
+      patch.phone = phone;
+    }
+  }
+  if (data.photoUrl !== undefined) {
+    const photoUrl = data.photoUrl.trim();
+    if (photoUrl) {
+      patch.photoUrl = photoUrl;
+    }
+  }
+
+  return patch;
+};
 
 export type CreateUserProfileInput = {
   uid: string;
@@ -120,10 +173,31 @@ export const updateUserProfile = async (
     return;
   }
 
+  const patch = pickDefinedFields(data, [
+    'fullName',
+    'phone',
+    'profileCompleted',
+    'emailVerified',
+    'college',
+    'department',
+    'skills',
+    'aboutMe',
+    'photoUrl',
+    'fcmToken',
+  ]);
+
+  const changedPatch = Object.fromEntries(
+    Object.entries(patch).filter(([key, value]) => existing[key as keyof UserProfile] !== value),
+  );
+
+  if (Object.keys(changedPatch).length === 0) {
+    return;
+  }
+
   await setDoc(
     userDocument(uid),
     {
-      ...data,
+      ...changedPatch,
       updatedAt: serverTimestamp(),
     },
     { merge: true },
@@ -194,19 +268,36 @@ export const mapFirestoreUser = (
 export const saveUserProfileDetails = async (
   uid: string,
   data: UpdateUserProfileDetailsInput,
+  context: SaveUserProfileContext,
 ): Promise<void> => {
-  const existing = await getUserProfile(uid);
-  if (!existing) {
-    return;
+  const profileRef = userDocument(uid);
+  const snapshot = await getDoc(profileRef);
+
+  if (!snapshot.exists()) {
+    await createUserProfileOnce({
+      uid,
+      email: context.email,
+      fullName: context.fullName,
+      emailVerified: context.emailVerified ?? false,
+    });
   }
 
-  await setDoc(
-    userDocument(uid),
-    {
-      ...data,
-      profileCompleted: true,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
+  const patch = buildProfileDetailsPatch(
+    pickDefinedFields(data, PROFILE_DETAIL_FIELDS) as UpdateUserProfileDetailsInput,
   );
+
+  try {
+    await setDoc(
+      profileRef,
+      {
+        ...patch,
+        profileCompleted: true,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
+  } catch (error) {
+    logError('saveUserProfileDetails', error, { uid, fields: Object.keys(patch) });
+    throw error;
+  }
 };

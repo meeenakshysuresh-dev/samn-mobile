@@ -20,11 +20,11 @@ export type AuthStackParamList = {
 };
 
 export type MainTabParamList = {
-  CreateStack: undefined;
-  ChatStack: undefined;
-  HomeStack: undefined;
-  ProfileStack: undefined;
-  SettingsStack: undefined;
+  CreateStack: NavigatorScreenParams<CreateStackParamList> | undefined;
+  ChatStack: NavigatorScreenParams<ChatStackParamList> | undefined;
+  HomeStack: NavigatorScreenParams<HomeStackParamList> | undefined;
+  ProfileStack: NavigatorScreenParams<ProfileStackParamList> | undefined;
+  SettingsStack: NavigatorScreenParams<SettingsStackParamList> | undefined;
 };
 
 export type HomeStackParamList = {
@@ -33,6 +33,15 @@ export type HomeStackParamList = {
 };
 
 export type CreateStackParamList = {
+  MyTasks: undefined;
+  PostTask: undefined;
+  EditTask: {
+    taskId: string;
+  };
+  BrowseTasks: undefined;
+  TaskDetails: {
+    taskId: string;
+  };
   Uploads: undefined;
 };
 
@@ -48,4 +57,6 @@ export type UploadsStackParamList = CreateStackParamList;
 
 export type SettingsStackParamList = {
   Settings: undefined;
+  AboutUs: undefined;
+  HelpSupport: undefined;
 };

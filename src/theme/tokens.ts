@@ -66,7 +66,7 @@ export const spacing = {
 // ── Header layout ─────────────────────────────────────────────────────────────
 
 export const header = {
-  borderRadius: 16,
+  borderRadius: 0,
   contentPaddingHorizontal: spacing.lg,
   contentPaddingBottom: spacing.lg,
   minTopInset: 10,
@@ -75,6 +75,7 @@ export const header = {
   iconButtonRadius: 12,
   iconSize: 22,
   rowMarginBottom: 16,
+  rowMinHeight: 64,
   titleSideMargin: 16,
   subtitleOpacity: 0.85,
 } as const;
