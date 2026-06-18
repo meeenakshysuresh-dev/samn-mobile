@@ -144,6 +144,10 @@ export const authStyles = StyleSheet.create({
     fontFamily: fontFamily.medium,
     fontSize: normalize(13),
   },
+  forgotLinkRow: {
+    alignSelf: 'flex-end',
+    marginTop: spacing.sm,
+  },
   inputWrapper: {
     backgroundColor: authColors.inputFill,
     borderWidth: 0,

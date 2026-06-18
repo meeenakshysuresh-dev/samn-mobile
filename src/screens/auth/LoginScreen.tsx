@@ -48,12 +48,7 @@ export const LoginScreen = () => {
       />
 
       <AppView style={authStyles.fieldSpacing}>
-        <AppView style={authStyles.labelRow}>
-          <AppText style={authStyles.fieldLabel}>Password</AppText>
-          <Pressable onPress={() => navigation.navigate('ForgotPassword')} hitSlop={8}>
-            <AppText style={authStyles.forgotLink}>Forgot?</AppText>
-          </Pressable>
-        </AppView>
+        <AppText style={authStyles.fieldLabel}>Password</AppText>
         <AppInput
           value={password}
           onChangeText={setPassword}
@@ -64,6 +59,13 @@ export const LoginScreen = () => {
           placeholderTextColor={authColors.inputPlaceholder}
           containerStyle={{ marginBottom: 0 }}
         />
+        <Pressable
+          onPress={() => navigation.navigate('ForgotPassword')}
+          hitSlop={8}
+          style={authStyles.forgotLinkRow}
+        >
+          <AppText style={authStyles.forgotLink}>Forgot password?</AppText>
+        </Pressable>
       </AppView>
 
       <AppButton
