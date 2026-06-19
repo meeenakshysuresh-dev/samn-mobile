@@ -2,6 +2,7 @@ export {
   exitCreateStackScreen,
   finishCreateTaskFlow,
   navigateToChat,
+  navigateToChatThread,
   navigateToCreateStack,
   navigateToHomeStack,
   navigateToProfile,

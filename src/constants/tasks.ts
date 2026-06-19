@@ -60,6 +60,7 @@ export const NOTIFICATION_EVENT_LABELS = {
   task_cancelled: 'Task cancelled',
   task_deleted: 'Task deleted',
   acceptance_cancelled: 'Acceptance cancelled',
+  chat_message: 'New message',
 } as const;
 
 const timeline = (

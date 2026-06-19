@@ -12,6 +12,7 @@ import {
 } from '../../hooks/useNotificationStore';
 import { markNotificationRead, markNotificationsRead } from '../../hooks/useNotificationSync';
 import { exitHomeStackScreen } from '../../navigation/stackNavigation';
+import { openChatThread } from '../../navigation/navigationRef';
 import { navigateToCreateStack } from '../../navigation/taskNavigation';
 import { useTabBarInset } from '../../navigation/tabBarLayout';
 import type { HomeStackParamList } from '../../navigation/RootNavigator.types';
@@ -41,9 +42,19 @@ export const NotificationsScreen = () => {
     [allItems],
   );
 
-  const handlePressNotification = (notificationId: string, taskId?: string, read?: boolean) => {
+  const handlePressNotification = (
+    notificationId: string,
+    taskId?: string,
+    read?: boolean,
+    chatRoomId?: string,
+    type?: string,
+  ) => {
     if (!read) {
       void markNotificationRead(user?.uid ?? null, notificationId);
+    }
+    if (type === 'chat' && chatRoomId) {
+      openChatThread(chatRoomId);
+      return;
     }
     if (taskId) {
       navigateToCreateStack(navigation, 'TaskDetails', { taskId });
@@ -83,7 +94,11 @@ export const NotificationsScreen = () => {
           </AppCard>
         }
         renderItem={({ item }) => (
-          <Pressable onPress={() => handlePressNotification(item.id, item.taskId, item.read)}>
+          <Pressable
+            onPress={() =>
+              handlePressNotification(item.id, item.taskId, item.read, item.chatRoomId, item.type)
+            }
+          >
             <AppCard
               style={[
                 styles.itemCard,
@@ -118,6 +133,11 @@ export const NotificationsScreen = () => {
                 {item.type === 'task' && item.eventType ? (
                   <AppText preset="caption" style={{ color: theme.textMuted }}>
                     {NOTIFICATION_EVENT_LABELS[item.eventType]}
+                  </AppText>
+                ) : null}
+                {item.type === 'chat' ? (
+                  <AppText preset="caption" style={{ color: theme.textMuted }}>
+                    Chat message
                   </AppText>
                 ) : null}
               </AppView>

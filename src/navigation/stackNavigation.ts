@@ -174,6 +174,18 @@ export const navigateToChat = (navigation: NavigationProp<ParamListBase>) => {
   getTabNavigation(navigation)?.navigate('ChatStack', { screen: 'Chat' });
 };
 
+export const navigateToChatThread = (
+  navigation: NavigationProp<ParamListBase>,
+  chatRoomId: string,
+) => {
+  getTabNavigation(navigation)?.navigate('ChatStack', {
+    state: {
+      routes: [{ name: 'Chat' }, { name: 'ChatThread', params: { chatRoomId } }],
+      index: 1,
+    },
+  });
+};
+
 export const navigateToProfile = (navigation: NavigationProp<ParamListBase>) => {
   getTabNavigation(navigation)?.navigate('ProfileStack', { screen: 'Profile' });
 };

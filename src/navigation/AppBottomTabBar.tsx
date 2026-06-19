@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '../components/AppIcon';
 import { AppText } from '../components/AppText';
+import { useAuth } from '../hooks/useAuth';
+import { useChatUnreadCount } from '../hooks/useChats';
 import { useThemeStore } from '../theme/useThemeStore';
 import { getTabBarBottomPadding } from './tabBarLayout';
 import { tabBarStyles } from './tabBarStyles';
@@ -25,6 +27,8 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
   const styles = tabBarStyles(theme);
   const insets = useSafeAreaInsets();
   const bottomPadding = getTabBarBottomPadding(insets);
+  const { user } = useAuth();
+  const chatUnreadCount = useChatUnreadCount(user?.uid ?? 'guest-user');
 
   const activeRoute = state.routes[state.index]?.name as TabKey;
   const inactive = theme.tabBarItemInactive;
@@ -51,6 +55,7 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
     selected: boolean,
     onPress?: () => void,
     disabled = false,
+    badgeCount = 0,
   ) => (
     <TouchableOpacity
       key={key}
@@ -60,14 +65,24 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
       activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityState={{ selected, disabled }}
+      accessibilityLabel={badgeCount > 0 ? `${label}, ${badgeCount} unread messages` : label}
     >
       <View style={styles.tabBarItemInner}>
-        <AppIcon
-          name={selected ? iconActive : iconInactive}
-          color={selected ? active : inactive}
-          width={24}
-          height={24}
-        />
+        <View style={styles.tabBarIconWrap}>
+          <AppIcon
+            name={selected ? iconActive : iconInactive}
+            color={selected ? active : inactive}
+            width={24}
+            height={24}
+          />
+          {badgeCount > 0 ? (
+            <View style={[styles.tabBarBadge, { backgroundColor: theme.error }]}>
+              <AppText style={styles.tabBarBadgeText}>
+                {badgeCount > 9 ? '9+' : badgeCount}
+              </AppText>
+            </View>
+          ) : null}
+        </View>
         <AppText
           style={[styles.tabBarLabel, selected ? styles.tabBarLabelActive : styles.tabBarLabelInactive]}
         >
@@ -105,6 +120,8 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
             'tabChatInactive',
             activeRoute === 'ChatStack',
             () => navigateTo('ChatStack'),
+            false,
+            chatUnreadCount,
           )}
         </View>
 

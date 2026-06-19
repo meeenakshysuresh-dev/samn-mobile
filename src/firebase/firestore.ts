@@ -17,3 +17,23 @@ export const notificationsCollection = () =>
 
 export const notificationDocument = (notificationId: string) =>
   doc(db(), FIRESTORE_COLLECTIONS.notifications, notificationId);
+
+/** Chat metadata: tasks/{taskId}/chat/meta */
+export const taskChatMetaDocument = (taskId: string) =>
+  doc(db(), FIRESTORE_COLLECTIONS.tasks, taskId, 'chat', 'meta');
+
+/** Messages: tasks/{taskId}/messages/{messageId} (sibling of chat/, not under chat/) */
+export const taskChatMessagesCollection = (taskId: string) =>
+  collection(db(), FIRESTORE_COLLECTIONS.tasks, taskId, 'messages');
+
+export const taskChatMessageDocument = (taskId: string, messageId: string) =>
+  doc(db(), FIRESTORE_COLLECTIONS.tasks, taskId, 'messages', messageId);
+
+/** chatRoomId is always the taskId */
+export const chatRoomDocument = (chatRoomId: string) => taskChatMetaDocument(chatRoomId);
+
+export const chatMessagesCollection = (chatRoomId: string) =>
+  taskChatMessagesCollection(chatRoomId);
+
+export const chatMessageDocument = (chatRoomId: string, messageId: string) =>
+  taskChatMessageDocument(chatRoomId, messageId);

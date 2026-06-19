@@ -47,6 +47,9 @@ export type CreateStackParamList = {
 
 export type ChatStackParamList = {
   Chat: undefined;
+  ChatThread: {
+    chatRoomId: string;
+  };
 };
 
 export type ProfileStackParamList = {

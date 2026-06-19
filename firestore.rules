@@ -12,6 +12,10 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    function isValidTaskStatus(status) {
+      return status in ['open', 'accepted', 'in_progress', 'completed', 'cancelled'];
+    }
+
     function isNotificationUnread() {
       return !('read' in resource.data) || resource.data.read == false;
     }
@@ -27,14 +31,19 @@ service cloud.firestore {
 
     // ─── users ─────────────────────────────────────────────────────────────
     match /users/{userId} {
-      allow read: if isUser(userId);
-      allow create: if isUser(userId);
-      allow update: if isUser(userId);
-      allow delete: if isUser(userId);
+      allow read, write: if isUser(userId);
     }
 
     // ─── tasks ─────────────────────────────────────────────────────────────
     match /tasks/{taskId} {
+      function isTaskParticipantById() {
+        let task = get(/databases/$(database)/documents/tasks/$(taskId)).data;
+        return isSignedIn() && (
+          task.ownerUid == request.auth.uid
+          || task.acceptedBy == request.auth.uid
+        );
+      }
+
       allow read: if isSignedIn();
 
       allow create: if isSignedIn()
@@ -42,9 +51,9 @@ service cloud.firestore {
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.ownerName is string
         && request.resource.data.title is string
-        && request.resource.data.status == 'open';
+        && request.resource.data.status == 'open'
+        && isValidTaskStatus(request.resource.data.status);
 
-      // Owner, assigned worker, or user accepting an open task
       allow update: if isSignedIn() && (
         resource.data.ownerUid == request.auth.uid
         || resource.data.acceptedBy == request.auth.uid
@@ -57,6 +66,41 @@ service cloud.firestore {
       allow delete: if isSignedIn()
         && resource.data.ownerUid == request.auth.uid
         && resource.data.status == 'open';
+
+      // Chat metadata: tasks/{taskId}/chat/meta
+      match /chat/meta {
+        allow read, create, update: if isTaskParticipantById();
+        allow delete: if false;
+      }
+
+      // Messages: tasks/{taskId}/messages/{messageId}
+      // (NOT chat/messages — that path is invalid alongside chat/meta)
+      match /messages/{messageId} {
+        function chatMetaActive() {
+          let metaPath = /databases/$(database)/documents/tasks/$(taskId)/chat/meta;
+          return exists(metaPath) && get(metaPath).data.status == 'active';
+        }
+
+        allow list: if isTaskParticipantById();
+        allow get: if isTaskParticipantById();
+
+        allow create: if isTaskParticipantById()
+          && request.resource.data.messageId == messageId
+          && request.resource.data.chatRoomId == taskId
+          && request.resource.data.senderUid == request.auth.uid
+          && request.resource.data.receiverUid is string
+          && request.resource.data.message is string
+          && request.resource.data.messageType is string
+          && chatMetaActive();
+
+        allow update: if isTaskParticipantById()
+          && (
+            request.auth.uid == resource.data.receiverUid
+            || request.auth.uid == resource.data.senderUid
+          );
+
+        allow delete: if false;
+      }
     }
 
     // ─── notifications ─────────────────────────────────────────────────────
@@ -64,7 +108,6 @@ service cloud.firestore {
       allow read: if isSignedIn()
         && resource.data.userId == request.auth.uid;
 
-      // Actor creates alert for owner/worker (e.g. on accept, complete)
       allow create: if isSignedIn()
         && request.resource.data.notificationId == notificationId
         && request.resource.data.actorUid == request.auth.uid
@@ -76,7 +119,6 @@ service cloud.firestore {
         && request.resource.data.body is string
         && request.resource.data.read != true;
 
-      // Recipient marks read (+ optional readAt timestamp)
       allow update: if isSignedIn()
         && resource.data.userId == request.auth.uid
         && isNotificationReadUpdate();
@@ -84,7 +126,6 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

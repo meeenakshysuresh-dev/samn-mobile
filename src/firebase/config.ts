@@ -30,6 +30,7 @@ export const FIRESTORE_COLLECTIONS = {
   users: 'users',
   tasks: 'tasks',
   notifications: 'notifications',
+  chatRooms: 'chatRooms',
 } as const;
 
 export const STORAGE_PATHS = {

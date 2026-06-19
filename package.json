@@ -7,7 +7,7 @@
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
-    "deploy:firestore": "firebase deploy --only firestore --project samn-mobile"
+    "deploy:firestore": "npx firebase-tools deploy --only firestore:rules --project samn-mobile"
   },
   "dependencies": {
     "@notifee/react-native": "^9.1.8",

@@ -97,3 +97,17 @@ export const navigateToResetPassword = (oobCode: string) => {
     }),
   );
 };
+
+export const openChatThread = (chatRoomId: string) => {
+  if (!navigationRef.isReady()) {
+    return;
+  }
+
+  navigationRef.navigate('MainTabs', {
+    screen: 'ChatStack',
+    params: {
+      screen: 'ChatThread',
+      params: { chatRoomId },
+    },
+  } as never);
+};

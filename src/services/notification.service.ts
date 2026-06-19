@@ -10,6 +10,8 @@ import {
   setBackgroundMessageHandler,
 } from '@react-native-firebase/messaging';
 
+import { openChatThread } from '../navigation/navigationRef';
+
 import { useNotificationStore } from '../hooks/useNotificationStore';
 import { useSettingsStore } from '../hooks/useSettingsStore';
 import { logError } from '../utils/errorLogger';
@@ -53,7 +55,11 @@ export const requestPushPermission = async (): Promise<boolean> => {
   );
 };
 
-export const showLocalPush = async (title: string, body: string) => {
+export const showLocalPush = async (
+  title: string,
+  body: string,
+  data?: Record<string, string>,
+) => {
   if (!canDisplayNotifications()) {
     return;
   }
@@ -62,6 +68,7 @@ export const showLocalPush = async (title: string, body: string) => {
   await notifee.displayNotification({
     title,
     body,
+    data,
     android: {
       channelId: SAMN_CHANNEL_ID,
       pressAction: { id: 'default' },
@@ -73,8 +80,8 @@ export const showLocalPush = async (title: string, body: string) => {
 export const displayLocalNotification = async (
   title: string,
   body: string,
-  type: 'registration' | 'profile_updated' | 'push' | 'task',
-  options?: { id?: string; taskId?: string },
+  type: 'registration' | 'profile_updated' | 'push' | 'task' | 'chat',
+  options?: { id?: string; taskId?: string; chatRoomId?: string },
 ) => {
   if (!canDisplayNotifications()) {
     return;
@@ -86,6 +93,7 @@ export const displayLocalNotification = async (
     body,
     type,
     taskId: options?.taskId,
+    chatRoomId: options?.chatRoomId,
   });
 
   await showLocalPush(title, body);
@@ -183,8 +191,11 @@ export const registerBackgroundMessageHandler = () => {
 };
 
 export const setupNotifeeForegroundEvents = () =>
-  notifee.onForegroundEvent(({ type }) => {
+  notifee.onForegroundEvent(({ type, detail }) => {
     if (type === EventType.PRESS) {
-      // Navigation handled by Notifications screen entry points.
+      const chatRoomId = detail.notification?.data?.chatRoomId;
+      if (typeof chatRoomId === 'string' && chatRoomId.length > 0) {
+        openChatThread(chatRoomId);
+      }
     }
   });

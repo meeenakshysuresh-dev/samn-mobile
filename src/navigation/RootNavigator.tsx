@@ -9,6 +9,7 @@ import { CompleteProfileScreen } from '../screens/auth/CompleteProfileScreen';
 import { EmailVerificationScreen } from '../screens/auth/EmailVerificationScreen';
 import { AuthNavigationBridge, SplashScreen } from '../screens/auth/SplashScreen';
 import { ChatScreen } from '../screens/chat/ChatScreen';
+import { ChatThreadScreen } from '../screens/chat/ChatThreadScreen';
 import { DashboardScreen } from '../screens/home/DashboardScreen';
 import { NotificationsScreen } from '../screens/notifications/NotificationsScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
@@ -61,8 +62,9 @@ const CreateStackNavigator = () => (
 );
 
 const ChatStackNavigator = () => (
-  <ChatStack.Navigator screenOptions={{ headerShown: false }}>
+  <ChatStack.Navigator initialRouteName="Chat" screenOptions={{ headerShown: false }}>
     <ChatStack.Screen name="Chat" component={ChatScreen} />
+    <ChatStack.Screen name="ChatThread" component={ChatThreadScreen} />
   </ChatStack.Navigator>
 );
 

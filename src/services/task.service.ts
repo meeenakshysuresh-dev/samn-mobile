@@ -18,6 +18,7 @@ import type { CreateTaskInput, Task, TaskStatus, UpdateTaskInput } from '../type
 import { mapFirestoreTaskDocument, mergeTaskLists, normalizeTaskStatus } from '../utils/taskMapper';
 import { logError } from '../utils/errorLogger';
 import { dispatchTaskNotifications } from './taskNotification.service';
+import { ensureChatRoomForTask, syncChatRoomTaskStatus } from './chat.service';
 import { canAcceptTask, canCancelAcceptance, canCancelTask, canCompleteTask, canDeleteTask, canEditTask, canStartTask } from '../utils/taskWorkflow';
 
 const OPEN_TASKS_LIMIT = 50;
@@ -292,6 +293,9 @@ export const acceptTask = async (
     });
     const task = await getTaskOrThrow(taskId);
     dispatchTaskNotifications('task_accepted', task, workerUid, workerName.trim());
+    void ensureChatRoomForTask(task).catch(error => {
+      logError('TaskService.acceptTask.ensureChatRoom', error, { taskId });
+    });
     return task;
   } catch (error) {
     return failTask(error, 'Failed to accept task.', 'acceptTask');
@@ -314,6 +318,7 @@ export const startTask = async (taskId: string, userId: string, actorName: strin
     });
     const task = await getTaskOrThrow(taskId);
     dispatchTaskNotifications('task_started', task, userId, actorName);
+    void syncChatRoomTaskStatus(taskId, task.status);
     return task;
   } catch (error) {
     return failTask(error, 'Failed to start task.', 'startTask');
@@ -337,6 +342,7 @@ export const completeTask = async (taskId: string, userId: string, actorName: st
     });
     const task = await getTaskOrThrow(taskId);
     dispatchTaskNotifications('task_completed', task, userId, actorName);
+    void syncChatRoomTaskStatus(taskId, 'completed');
     return task;
   } catch (error) {
     return failTask(error, 'Failed to complete task.', 'completeTask');
@@ -360,6 +366,7 @@ export const cancelTask = async (taskId: string, userId: string, actorName: stri
     });
     const task = await getTaskOrThrow(taskId);
     dispatchTaskNotifications('task_cancelled', task, userId, actorName);
+    void syncChatRoomTaskStatus(taskId, 'cancelled');
     return task;
   } catch (error) {
     return failTask(error, 'Failed to cancel task.', 'cancelTask');
@@ -390,6 +397,7 @@ export const cancelAcceptance = async (taskId: string, userId: string, actorName
       userId,
       actorName,
     );
+    void syncChatRoomTaskStatus(taskId, 'open');
     return reopenedTask;
   } catch (error) {
     return failTask(error, 'Failed to cancel acceptance.', 'cancelAcceptance');

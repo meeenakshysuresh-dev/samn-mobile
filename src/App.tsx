@@ -8,6 +8,7 @@ import { AppLoader } from './components';
 import { AppBootstrap } from './components/AppBootstrap';
 import { AppStatusBar } from './components/AppStatusBar/AppStatusBar';
 import { AuthProvider } from './contexts/AuthContext';
+import { ChatProvider } from './contexts/ChatContext';
 import { linkingConfig } from './navigation/linking';
 import { flushPendingNavigation, navigationRef } from './navigation/navigationRef';
 import { RootNavigator } from './navigation';
@@ -20,22 +21,24 @@ const App = () => {
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>
         <AuthProvider>
-          <AppBootstrap />
-          <AppStatusBar />
-          <SafeAreaView
-            style={[styles.safeArea, { backgroundColor: theme.background }]}
-            edges={['left', 'right']}
-          >
-            <NavigationContainer
-              ref={navigationRef}
-              linking={linkingConfig}
-              theme={colors.navigation}
-              onReady={flushPendingNavigation}
+          <ChatProvider>
+            <AppBootstrap />
+            <AppStatusBar />
+            <SafeAreaView
+              style={[styles.safeArea, { backgroundColor: theme.background }]}
+              edges={['left', 'right']}
             >
-              <RootNavigator />
-            </NavigationContainer>
-            <AppLoader />
-          </SafeAreaView>
+              <NavigationContainer
+                ref={navigationRef}
+                linking={linkingConfig}
+                theme={colors.navigation}
+                onReady={flushPendingNavigation}
+              >
+                <RootNavigator />
+              </NavigationContainer>
+              <AppLoader />
+            </SafeAreaView>
+          </ChatProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

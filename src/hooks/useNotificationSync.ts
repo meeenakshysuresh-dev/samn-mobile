@@ -39,7 +39,11 @@ export const useNotificationSync = (userId: string | null | undefined) => {
           }
 
           if (!notification.read) {
-            void showLocalPush(notification.title, notification.body);
+            void showLocalPush(notification.title, notification.body, {
+              chatRoomId: notification.chatRoomId ?? '',
+              taskId: notification.taskId ?? '',
+              type: notification.type,
+            });
           }
         });
 
@@ -68,7 +72,7 @@ export const markNotificationRead = async (
 
   useNotificationStore.getState().markAsRead(notificationId);
 
-  if (!userId || !notification || notification.type !== 'task') {
+  if (!userId || !notification || (notification.type !== 'task' && notification.type !== 'chat')) {
     return;
   }
 
@@ -82,7 +86,7 @@ export const markNotificationRead = async (
 export const markNotificationsRead = async (userId: string | null | undefined) => {
   const taskNotificationIds = useNotificationStore
     .getState()
-    .items.filter(item => item.type === 'task' && !item.read)
+    .items.filter(item => (item.type === 'task' || item.type === 'chat') && !item.read)
     .map(item => item.id);
 
   useNotificationStore.getState().markAllRead();

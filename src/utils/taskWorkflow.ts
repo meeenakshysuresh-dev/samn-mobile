@@ -85,6 +85,19 @@ export const getTaskActions = (task: Task, userId: string): TaskActionKey[] => {
 export const isBrowseableTask = (task: Task, userId: string) =>
   task.status === 'open' && task.ownerId !== userId;
 
+export const canAccessTaskChat = (task: Task, userId?: string): boolean => {
+  if (!task.workerId) {
+    return false;
+  }
+  if (task.status === 'open' || task.status === 'cancelled') {
+    return false;
+  }
+  if (userId) {
+    return task.ownerId === userId || task.workerId === userId;
+  }
+  return true;
+};
+
 export const createTimelineEvent = (
   status: TaskStatus,
   label: string,

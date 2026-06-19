@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 import type { TaskNotificationEventType } from '../types/notification.types';
 
-export type AppNotificationType = 'registration' | 'profile_updated' | 'push' | 'task';
+export type AppNotificationType = 'registration' | 'profile_updated' | 'push' | 'task' | 'chat';
 
 export type AppNotificationItem = {
   id: string;
@@ -11,6 +11,7 @@ export type AppNotificationItem = {
   body: string;
   type: AppNotificationType;
   taskId?: string;
+  chatRoomId?: string;
   eventType?: TaskNotificationEventType;
   createdAt: number;
   readAt?: number;
@@ -74,7 +75,7 @@ export const useNotificationStore = create<NotificationStoreState>((set, get) =>
 
   syncNotifications: items => {
     set(state => {
-      const localOnly = state.items.filter(item => item.type !== 'task');
+      const localOnly = state.items.filter(item => item.type !== 'task' && item.type !== 'chat');
       const merged = [...items, ...localOnly]
         .sort((a, b) => b.createdAt - a.createdAt)
         .slice(0, 50);

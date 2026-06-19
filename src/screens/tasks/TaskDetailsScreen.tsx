@@ -13,10 +13,11 @@ import { useTaskUserContext } from '../../hooks/useTaskUserContext';
 import { useTabBarInset } from '../../navigation/tabBarLayout';
 import type { CreateStackParamList } from '../../navigation/RootNavigator.types';
 import { exitCreateStackScreen } from '../../navigation/taskNavigation';
+import { navigateToChatThread } from '../../navigation/stackNavigation';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { spacing } from '../../theme/tokens';
 import type { TaskActionKey } from '../../types/task.types';
-import { getTaskActions, getTaskViewerRole } from '../../utils/taskWorkflow';
+import { canAccessTaskChat, getTaskActions, getTaskViewerRole } from '../../utils/taskWorkflow';
 import { TaskStatusBadge } from './components/TaskStatusBadge';
 import { TaskTimeline } from './components/TaskTimeline';
 
@@ -142,6 +143,16 @@ export const TaskDetailsScreen = () => {
           </AppText>
           <TaskTimeline events={task.timeline} />
         </AppCard>
+
+        {canAccessTaskChat(task, userId) ? (
+          <View style={styles.actions}>
+            <AppButton
+              text="Open Chat"
+              preset="primary"
+              onPress={() => navigateToChatThread(navigation, task.id)}
+            />
+          </View>
+        ) : null}
 
         {role !== 'viewer' || actions.length > 0 ? (
           <View style={styles.actions}>

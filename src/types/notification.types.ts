@@ -7,12 +7,14 @@ export type TaskNotificationEventType =
   | 'task_completed'
   | 'task_cancelled'
   | 'task_deleted'
-  | 'acceptance_cancelled';
+  | 'acceptance_cancelled'
+  | 'chat_message';
 
 export type FirestoreNotificationDocument = {
   notificationId: string;
   userId: string;
   taskId: string;
+  chatRoomId?: string;
   eventType: TaskNotificationEventType;
   title: string;
   body: string;
