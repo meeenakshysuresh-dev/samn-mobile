@@ -11,7 +11,7 @@ export { AppCheckbox } from './AppCheckbox';
 export { AppSwitch } from './AppSwitch';
 export { AppRadioGroup } from './AppRadioGroup';
 export { AppLoader } from './AppLoader';
-export { AppLogo } from './AppLogo';
+export { AppLogo, HeaderAppLogo, HeaderAppWordmark } from './AppLogo';
 export { AppIcon } from './AppIcon';
 export { KeyboardAvoiding } from './KeyboardAvoiding';
 export { Screen } from './Screen';

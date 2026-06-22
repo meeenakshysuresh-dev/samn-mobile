@@ -109,13 +109,14 @@ export const mapFirestoreTaskDocument = (
     return null;
   }
 
-  const doc = data as FirestoreTaskDocument;
+  const doc = data as FirestoreTaskDocument & { taskName?: string; name?: string };
   const createdAt = timestampToIso(doc.createdAt as FirebaseFirestoreTypes.Timestamp);
   const status = normalizeTaskStatus(doc.status);
+  const title = String(doc.title ?? doc.taskName ?? doc.name ?? '').trim();
 
   return {
     id: doc.taskId || id,
-    title: doc.title ?? '',
+    title,
     category: doc.category,
     description: doc.description ?? '',
     location: doc.location ?? '',

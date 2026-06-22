@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppSwitch, AppText, AppView, CommonHeader } from '../../components';
+import { AppSwitch, AppText, AppView, CommonHeader, HeaderAppWordmark } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
 import { useUnreadNotificationCount } from '../../hooks/useNotificationStore';
@@ -90,6 +90,7 @@ export const SettingsScreen = () => {
         title="Settings"
         showBackButton={false}
         safeArea={false}
+        leftContent={<HeaderAppWordmark />}
         rightIcon="bell"
         rightBadgeCount={unreadNotificationCount}
         onRightPress={() => navigateToHomeStack(navigation, 'Notifications')}

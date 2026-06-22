@@ -5,6 +5,7 @@ import { AppText } from '../../../components';
 import { useAppTheme } from '../../../theme/useAppTheme';
 import { brand, fontFamily, spacing } from '../../../theme/tokens';
 import type { TaskCategory } from '../../../types/task.types';
+import { taskSoftShadow } from '../taskUiStyles';
 
 type CategoryChipProps = {
   label: TaskCategory | string;
@@ -19,17 +20,19 @@ export const CategoryChip = ({ label, selected = false, onPress }: CategoryChipP
     <Pressable
       style={[
         styles.chip,
-        {
-          backgroundColor: selected ? brand.primary : theme.card,
-          borderColor: selected ? brand.primary : theme.border,
-        },
+        selected
+          ? [{ backgroundColor: brand.primary, borderColor: brand.primary }, taskSoftShadow(theme)]
+          : {
+              backgroundColor: theme.card,
+              borderColor: theme.borderBrand,
+            },
       ]}
       onPress={onPress}
     >
       <AppText
         style={{
-          color: selected ? brand.onPrimary : theme.textPrimary,
-          fontFamily: fontFamily.medium,
+          color: selected ? brand.onPrimary : brand.primary,
+          fontFamily: fontFamily.semibold,
           fontSize: 12,
         }}
       >
@@ -42,7 +45,7 @@ export const CategoryChip = ({ label, selected = false, onPress }: CategoryChipP
 const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.sm + 2,
     borderRadius: 999,
     borderWidth: 1,
     marginRight: spacing.sm,

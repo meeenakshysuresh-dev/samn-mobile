@@ -15,6 +15,7 @@ import { exitCreateStackScreen } from '../../navigation/taskNavigation';
 import { useAppTheme } from '../../theme/useAppTheme';
 import { spacing } from '../../theme/tokens';
 import type { TaskCategory } from '../../types/task.types';
+import { taskMatchesSearchQuery } from '../../utils/taskSearch';
 import { CategoryChip } from './components/CategoryChip';
 import { TaskCard } from './components/TaskCard';
 
@@ -47,15 +48,9 @@ export const BrowseTasksScreen = () => {
   const [selectedCategory, setSelectedCategory] = useState<TaskCategory | 'All'>('All');
 
   const filteredTasks = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
     return browseableTasks.filter(task => {
       const matchesCategory = selectedCategory === 'All' || task.category === selectedCategory;
-      const matchesQuery =
-        !normalizedQuery ||
-        task.title.toLowerCase().includes(normalizedQuery) ||
-        task.category.toLowerCase().includes(normalizedQuery) ||
-        task.location.toLowerCase().includes(normalizedQuery);
-      return matchesCategory && matchesQuery;
+      return matchesCategory && taskMatchesSearchQuery(task, query);
     });
   }, [browseableTasks, query, selectedCategory]);
 

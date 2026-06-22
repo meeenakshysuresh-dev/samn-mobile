@@ -3,8 +3,17 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '../../../components';
 import { useAppTheme } from '../../../theme/useAppTheme';
-import { brand, fontFamily, spacing } from '../../../theme/tokens';
+import { brand, fontFamily } from '../../../theme/tokens';
 import type { MyTasksSection } from '../../../types/task.types';
+import {
+  TASK_SEGMENT_HEIGHT,
+  TASK_SEGMENT_RADIUS,
+  TASK_SEGMENT_TAB_HEIGHT,
+  TASK_SEGMENT_TAB_RADIUS,
+  TASK_SEGMENT_TRACK_PADDING,
+  taskInsetShadow,
+  taskSoftShadow,
+} from '../taskUiStyles';
 
 type MyTasksSegmentTabsProps = {
   activeSection: MyTasksSection;
@@ -20,7 +29,7 @@ export const MyTasksSegmentTabs = ({ activeSection, onChange }: MyTasksSegmentTa
   const { theme } = useAppTheme();
 
   return (
-    <View style={[styles.wrap, { backgroundColor: theme.surfaceSecondary, borderColor: theme.border }]}>
+    <View style={[styles.wrap, taskInsetShadow(theme), { backgroundColor: theme.surfaceTertiary }]}>
       {SECTIONS.map(section => {
         const selected = activeSection === section.key;
         return (
@@ -28,7 +37,10 @@ export const MyTasksSegmentTabs = ({ activeSection, onChange }: MyTasksSegmentTa
             key={section.key}
             style={[
               styles.tab,
-              selected && { backgroundColor: theme.card, shadowColor: theme.shadow },
+              selected && [
+                taskSoftShadow(theme, true),
+                { backgroundColor: theme.card },
+              ],
             ]}
             onPress={() => onChange(section.key)}
           >
@@ -37,6 +49,7 @@ export const MyTasksSegmentTabs = ({ activeSection, onChange }: MyTasksSegmentTa
                 color: selected ? brand.primary : theme.textSecondary,
                 fontFamily: fontFamily.semibold,
                 fontSize: 12,
+                lineHeight: 16,
               }}
             >
               {section.label}
@@ -51,15 +64,15 @@ export const MyTasksSegmentTabs = ({ activeSection, onChange }: MyTasksSegmentTa
 const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 4,
+    borderRadius: TASK_SEGMENT_RADIUS,
+    padding: TASK_SEGMENT_TRACK_PADDING,
+    height: TASK_SEGMENT_HEIGHT,
   },
   tab: {
     flex: 1,
+    height: TASK_SEGMENT_TAB_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.sm,
-    borderRadius: 10,
+    borderRadius: TASK_SEGMENT_TAB_RADIUS,
   },
 });

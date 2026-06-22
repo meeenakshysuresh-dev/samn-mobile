@@ -152,20 +152,22 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
             accessibilityLabel="Home"
             accessibilityState={{ selected: activeRoute === 'HomeStack' }}
           >
-            <LinearGradient
-              colors={[...theme.gradientScanFab]}
-              locations={[0.3, 1]}
-              start={{ x: 0, y: 0.6 }}
-              end={{ x: 1, y: 0.3 }}
-              style={styles.tabBarScanButton}
-            >
-              <AppIcon
-                name={activeRoute === 'HomeStack' ? 'tabHomeActive' : 'tabHomeInactive'}
-                color={theme.textInverse}
-                width={24}
-                height={24}
-              />
-            </LinearGradient>
+            <View style={styles.tabBarScanRing}>
+              <LinearGradient
+                colors={[...theme.gradientScanFab]}
+                locations={[0.3, 1]}
+                start={{ x: 0, y: 0.6 }}
+                end={{ x: 1, y: 0.3 }}
+                style={styles.tabBarScanButton}
+              >
+                <AppIcon
+                  name={activeRoute === 'HomeStack' ? 'tabHomeActive' : 'tabHomeInactive'}
+                  color={theme.textInverse}
+                  width={24}
+                  height={24}
+                />
+              </LinearGradient>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

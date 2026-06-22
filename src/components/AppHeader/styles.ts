@@ -115,6 +115,12 @@ export const createAppHeaderStyles = createThemedStyles(
       alignItems: 'center',
       justifyContent: 'center',
     },
+    gsHeaderLeftSlot: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      minWidth: headerTokens.iconButtonSize,
+      minHeight: headerTokens.iconButtonSize,
+    },
     headerBadge: {
       position: 'absolute',
       top: -4,

@@ -75,6 +75,7 @@ export const IconRegistry = {
   fileText: vector('feather', 'file-text'),
   globe: vector('feather', 'globe'),
   messageCircle: vector('feather', 'message-circle'),
+  send: vector('ion', 'send'),
   calendar: vector('feather', 'calendar'),
   dollarSign: vector('feather', 'dollar-sign'),
 } as const;

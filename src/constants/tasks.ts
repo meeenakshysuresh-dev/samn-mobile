@@ -325,6 +325,20 @@ export const RECENT_ACTIVITY: ActivityItem[] = [
 
 export const formatBudget = (amount: number) => `$${amount.toFixed(0)}`;
 
+export const TASK_CATEGORY_EMOJI: Record<(typeof TASK_CATEGORIES)[number], string> = {
+  Cleaning: '🧹',
+  Delivery: '📦',
+  Repairs: '🔧',
+  Gardening: '🌿',
+  Tutoring: '📚',
+  Shopping: '🛒',
+  Moving: '🚚',
+  'Pet Care': '🐾',
+};
+
+export const getTaskCategoryEmoji = (category: string): string =>
+  TASK_CATEGORY_EMOJI[category as (typeof TASK_CATEGORIES)[number]] ?? '📋';
+
 export const mapSeedTasksForUser = (tasks: Task[], userId: string, userName: string): Task[] =>
   tasks.map(task => ({
     ...task,

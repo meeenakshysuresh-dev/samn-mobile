@@ -5,7 +5,7 @@ import { getCrashlytics, log } from '@react-native-firebase/crashlytics';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppText, AppView, CommonHeader, SectionHeading } from '../../components';
+import { AppText, AppView, CommonHeader, HeaderAppWordmark, SectionHeading } from '../../components';
 import { TASK_CATEGORIES } from '../../constants/tasks';
 import { useAuth } from '../../hooks/useAuth';
 import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
@@ -78,6 +78,7 @@ export const DashboardScreen = () => {
         greetingTitle
         showBackButton={false}
         safeArea={false}
+        leftContent={<HeaderAppWordmark />}
         rightIcon="bell"
         rightBadgeCount={unreadNotificationCount}
         onRightPress={() => navigation.navigate('Notifications')}

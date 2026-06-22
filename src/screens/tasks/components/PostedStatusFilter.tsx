@@ -4,8 +4,16 @@ import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { AppText } from '../../../components';
 import { POSTED_TASK_FILTER_TABS } from '../../../constants/tasks';
 import { useAppTheme } from '../../../theme/useAppTheme';
-import { brand, fontFamily, spacing } from '../../../theme/tokens';
+import { brand, fontFamily } from '../../../theme/tokens';
 import type { PostedTaskFilterTab } from '../../../types/task.types';
+import {
+  TASK_CHIP_GAP,
+  TASK_CHIP_PADDING_H,
+  TASK_CHIP_PADDING_V,
+  TASK_CHIP_SCROLL_PADDING_H,
+  TASK_SCREEN_HORIZONTAL_PADDING,
+  taskSoftShadow,
+} from '../taskUiStyles';
 
 type PostedStatusFilterProps = {
   value: PostedTaskFilterTab;
@@ -16,7 +24,12 @@ export const PostedStatusFilter = ({ value, onChange }: PostedStatusFilterProps)
   const { theme } = useAppTheme();
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.scroll}
+      contentContainerStyle={styles.row}
+    >
       {POSTED_TASK_FILTER_TABS.map(tab => {
         const selected = value === tab.key;
         return (
@@ -24,18 +37,21 @@ export const PostedStatusFilter = ({ value, onChange }: PostedStatusFilterProps)
             key={tab.key}
             style={[
               styles.chip,
-              {
-                backgroundColor: selected ? brand.primary : theme.surfaceSecondary,
-                borderColor: selected ? brand.primary : theme.border,
-              },
+              selected
+                ? [{ backgroundColor: brand.primary, borderColor: brand.primary }, taskSoftShadow(theme)]
+                : {
+                    backgroundColor: theme.card,
+                    borderColor: theme.borderBrand,
+                  },
             ]}
             onPress={() => onChange(tab.key)}
           >
             <AppText
               style={{
-                color: selected ? brand.onPrimary : theme.textSecondary,
+                color: selected ? brand.onPrimary : brand.primary,
                 fontFamily: fontFamily.semibold,
-                fontSize: 12,
+                fontSize: 11,
+                lineHeight: 14,
               }}
             >
               {tab.label}
@@ -48,15 +64,21 @@ export const PostedStatusFilter = ({ value, onChange }: PostedStatusFilterProps)
 };
 
 const styles = StyleSheet.create({
+  scroll: {
+    marginHorizontal: -TASK_SCREEN_HORIZONTAL_PADDING,
+  },
   row: {
-    paddingBottom: spacing.xs,
-    gap: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: TASK_CHIP_GAP,
+    paddingHorizontal: TASK_CHIP_SCROLL_PADDING_H,
+    paddingVertical: 2,
   },
   chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: 8,
+    paddingHorizontal: TASK_CHIP_PADDING_H,
+    paddingVertical: TASK_CHIP_PADDING_V,
     borderRadius: 999,
     borderWidth: 1,
-    marginRight: spacing.sm,
+    marginVertical:10
   },
 });

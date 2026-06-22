@@ -14,6 +14,7 @@ import {
   AppText,
   AppView,
   CommonHeader,
+  HeaderAppWordmark,
 } from '../../components';
 // Image upload temporarily disabled
 // import { usePhotoPicker } from '../../components/PhotoPicker/usePhotoPicker';
@@ -165,6 +166,7 @@ export const ProfileScreen = () => {
         title={isEditing ? 'Edit Profile' : 'Profile Details'}
         showBackButton={false}
         safeArea={false}
+        leftContent={<HeaderAppWordmark />}
         rightIcon={isEditing ? undefined : 'edit'}
         onRightPress={isEditing ? undefined : handleEdit}
       />

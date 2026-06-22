@@ -54,6 +54,7 @@ type GradientHeaderProps = {
   onRightPress?: () => void;
   rightBadgeCount?: number;
   rightContent?: React.ReactNode;
+  leftContent?: React.ReactNode;
   greetingTitle?: boolean;
   safeArea?: boolean;
 };
@@ -71,6 +72,7 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
   onRightPress,
   rightBadgeCount = 0,
   rightContent,
+  leftContent,
   greetingTitle = false,
   safeArea = true,
 }) => {
@@ -110,6 +112,8 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
             >
               <AppIcon name="chevronLeft" width={headerTokens.iconSize} height={headerTokens.iconSize} color={theme.headerText} rtlFlip={isRTL} />
             </TouchableOpacity>
+          ) : leftContent ? (
+            <AppView style={styles.gsHeaderLeftSlot}>{leftContent}</AppView>
           ) : (
             <AppView style={styles.gsBackBtnPill} />
           )}

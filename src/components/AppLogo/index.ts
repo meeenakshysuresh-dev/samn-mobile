@@ -1,1 +1,1 @@
-export { AppLogo, APP_LOGO, APP_WORDMARK } from './AppLogo';
+export { AppLogo, APP_LOGO, APP_WORDMARK, HEADER_LOGO_SIZE, HEADER_WORDMARK_HEIGHT, HEADER_WORDMARK_WIDTH, HeaderAppLogo, HeaderAppWordmark } from './AppLogo';

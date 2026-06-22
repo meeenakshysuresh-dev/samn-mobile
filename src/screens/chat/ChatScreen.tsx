@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'r
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { AppText, AppView, CommonHeader } from '../../components';
+import { AppText, AppView, CommonHeader, HeaderAppWordmark } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
 import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
 import { useChatRooms } from '../../hooks/useChats';
@@ -49,6 +49,7 @@ export const ChatScreen = () => {
         title="Chat"
         showBackButton={false}
         safeArea={false}
+        leftContent={<HeaderAppWordmark />}
         rightIcon="bell"
         rightBadgeCount={unreadNotificationCount}
         onRightPress={() => navigateToHomeStack(navigation, 'Notifications')}

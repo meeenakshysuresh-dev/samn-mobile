@@ -8423,6 +8423,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-pager-view@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "react-native-pager-view@npm:8.0.2"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: fc176da3f649ae2103f32815a944578102d17b132583caa0f91a9e41a09c0d88da6e55dbf5724aa5ebb0805dd10476ed9e7b6761976911a932d4570d56bf544c
+  languageName: node
+  linkType: hard
+
 "react-native-safe-area-context@npm:^5.8.0":
   version: 5.8.0
   resolution: "react-native-safe-area-context@npm:5.8.0"
@@ -8443,6 +8453,19 @@ __metadata:
     react: "*"
     react-native: ">=0.82.0"
   checksum: 075cb46262eba276a7af67e036d6d4eabf8d0964e2abf3efde33dbff3ddcdbe3e69d3b323363152e1e7fe9b36da614faf650c81dbc00e820594ce188d024dbbf
+  languageName: node
+  linkType: hard
+
+"react-native-tab-view@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "react-native-tab-view@npm:4.3.1"
+  dependencies:
+    use-latest-callback: ^0.2.4
+  peerDependencies:
+    react: ">= 18.2.0"
+    react-native: "*"
+    react-native-pager-view: ">= 6.0.0"
+  checksum: b3ca05f25a8c6be4deb84ef425676c85ebb7d08b8fea39fd8c72a5fdb45e2594815520b69ca16d00ff1f264f62d79752a4839c2360509fcfebb6fdca1008087a
   languageName: node
   linkType: hard
 
@@ -8817,8 +8840,10 @@ __metadata:
     react-native-gesture-handler: ^3.0.1
     react-native-image-picker: ^8.2.1
     react-native-linear-gradient: ^2.8.3
+    react-native-pager-view: ^8.0.2
     react-native-safe-area-context: ^5.8.0
     react-native-screens: ^4.25.2
+    react-native-tab-view: ^4.3.1
     react-native-vector-icons: ^10.3.0
     react-test-renderer: 19.2.0
     typescript: ^5.8.3
