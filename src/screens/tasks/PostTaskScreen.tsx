@@ -99,6 +99,7 @@ export const PostTaskScreen = () => {
       <AppButton
         text={submitting ? 'Posting...' : 'Post Task'}
         icon={submitting ? undefined : 'plus'}
+        preset="primary"
         style={taskFormStyles.submit}
         onPress={() => void handleSubmit()}
         disabled={submitting}

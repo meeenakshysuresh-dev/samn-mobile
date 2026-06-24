@@ -100,8 +100,8 @@ export const UploadsScreen = ({ navigation }: Props) => {
         </AppText>
 
         <View style={[styles.panel, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <AppButton text="Choose Image" icon="image" disabled={isUploading} onPress={openPhotoPicker} />
-        <AppButton text="Choose File" icon="file" disabled={isUploading} onPress={chooseDocument} />
+        <AppButton text="Choose Image" icon="image" preset="primary" disabled={isUploading} onPress={openPhotoPicker} />
+        <AppButton text="Choose File" icon="file" preset="primary" disabled={isUploading} onPress={chooseDocument} />
 
         <View style={styles.statusRow}>
           {isUploading ? <ActivityIndicator color={theme.primary} /> : null}

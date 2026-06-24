@@ -50,7 +50,7 @@ export const EmptyTaskState = ({
         {description}
       </AppText>
       {onCreatePress ? (
-        <AppButton text={buttonText} icon="plus" style={styles.button} onPress={onCreatePress} />
+        <AppButton text={buttonText} icon="plus" preset="primary" style={styles.button} onPress={onCreatePress} />
       ) : null}
     </View>
   );

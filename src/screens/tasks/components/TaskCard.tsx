@@ -90,7 +90,7 @@ export const TaskCard = ({
 
         <View style={styles.refinedMetaGrid}>
           <View style={styles.metaItem}>
-            <AppIcon name="dollarSign" width={14} height={14} color={brand.primary} />
+            <AppIcon name="currencyInr" width={14} height={14} color={brand.primary} />
             <AppText preset="caption" style={[styles.metaText, { color: theme.textPrimary, fontFamily: fontFamily.semibold }]}>
               {formatBudget(task.budget)}
             </AppText>
@@ -181,7 +181,7 @@ export const TaskCard = ({
           </AppText>
 
           <View style={styles.gridMetaRow}>
-            <AppIcon name="dollarSign" width={13} height={13} color={theme.textSecondary} />
+            <AppIcon name="currencyInr" width={13} height={13} color={theme.textSecondary} />
             <AppText preset="caption" style={[styles.metaText, { color: theme.textSecondary, fontFamily: fontFamily.semibold }]}>
               {formatBudget(task.budget)}
             </AppText>
@@ -248,7 +248,7 @@ export const TaskCard = ({
 
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
-          <AppIcon name="dollarSign" width={14} height={14} color={theme.textSecondary} />
+          <AppIcon name="currencyInr" width={14} height={14} color={theme.textSecondary} />
           <AppText preset="caption" style={[styles.metaText, { color: theme.textSecondary }]}>
             {formatBudget(task.budget)}
           </AppText>
@@ -270,7 +270,7 @@ export const TaskCard = ({
         <View style={[styles.actionDivider, { backgroundColor: theme.border }]}>
           <AppButton
             text={primaryAction.label}
-            preset={primaryAction.preset ?? 'secondary'}
+            preset={primaryAction.preset === 'secondary' ? 'primary' : (primaryAction.preset ?? 'primary')}
             compact
             icon={primaryAction.icon}
             textColor={primaryAction.textColor}

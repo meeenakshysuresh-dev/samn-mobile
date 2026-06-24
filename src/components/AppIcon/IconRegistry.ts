@@ -78,6 +78,7 @@ export const IconRegistry = {
   send: vector('ion', 'send'),
   calendar: vector('feather', 'calendar'),
   dollarSign: vector('feather', 'dollar-sign'),
+  currencyInr: vector('materialCommunity', 'currency-inr'),
 } as const;
 
 export type IconName = keyof typeof IconRegistry;

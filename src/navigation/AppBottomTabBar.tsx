@@ -1,13 +1,13 @@
 import React, { useRef } from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import LinearGradient from 'react-native-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppIcon } from '../components/AppIcon';
 import { AppText } from '../components/AppText';
 import { useAuth } from '../hooks/useAuth';
 import { useChatUnreadCount } from '../hooks/useChats';
+import { brand } from '../theme/tokens';
 import { useThemeStore } from '../theme/useThemeStore';
 import { getTabBarBottomPadding } from './tabBarLayout';
 import { tabBarStyles } from './tabBarStyles';
@@ -152,22 +152,14 @@ export const AppBottomTabBar: React.FC<AppBottomTabBarProps> = ({
             accessibilityLabel="Home"
             accessibilityState={{ selected: activeRoute === 'HomeStack' }}
           >
-            <View style={styles.tabBarScanRing}>
-              <LinearGradient
-                colors={[...theme.gradientScanFab]}
-                locations={[0.3, 1]}
-                start={{ x: 0, y: 0.6 }}
-                end={{ x: 1, y: 0.3 }}
-                style={styles.tabBarScanButton}
-              >
+            <View style={[styles.tabBarScanButton, { backgroundColor: brand.primary }]}>
                 <AppIcon
                   name={activeRoute === 'HomeStack' ? 'tabHomeActive' : 'tabHomeInactive'}
-                  color={theme.textInverse}
+                  color={brand.onPrimary}
                   width={24}
                   height={24}
                 />
-              </LinearGradient>
-            </View>
+              </View>
           </TouchableOpacity>
         </View>
       </View>

@@ -23,6 +23,12 @@ export const taskFormStyles = StyleSheet.create({
   field: {
     marginBottom: taskFormLayout.fieldGap,
   },
+  descriptionField: {
+    marginBottom: spacing.xxl+30,
+  },
+  locationField: {
+    marginTop: spacing.xxl,
+  },
   inputWrapper: {
     borderRadius: taskFormLayout.inputRadius,
     minHeight: taskFormLayout.inputHeight,
@@ -31,6 +37,7 @@ export const taskFormStyles = StyleSheet.create({
     minHeight: taskFormLayout.textAreaMinHeight,
     alignItems: 'flex-start',
     paddingTop: spacing.sm,
+    overflow: 'hidden',
   },
   inputText: {
     fontFamily: fontFamily.regular,

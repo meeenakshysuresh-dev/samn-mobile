@@ -139,7 +139,7 @@ export const useTaskActions = (userId: string, userName: string) => {
     if (includeView) {
       cardActions.push({
         label: 'View Details',
-        preset: 'secondary' as const,
+        preset: 'primary' as const,
         onPress: () => navigation.navigate('TaskDetails', { taskId: task.id }),
       });
     }
@@ -149,7 +149,10 @@ export const useTaskActions = (userId: string, userName: string) => {
       cardActions.push({
         label: TASK_ACTION_LABELS[key],
         icon: ACTION_ICONS[key],
-        preset: key === 'accept' || key === 'complete' ? ('primary' as const) : ('inline' as const),
+        preset:
+          key === 'accept' || key === 'complete' || key === 'start'
+            ? ('primary' as const)
+            : ('inline' as const),
         textColor: destructive ? '#B42318' : undefined,
         onPress: () => runAction(task, key),
       });
@@ -170,7 +173,7 @@ export const useTaskActions = (userId: string, userName: string) => {
       }
       return {
         label: 'View Details',
-        preset: 'secondary' as const,
+        preset: 'primary' as const,
         onPress: () => navigation.navigate('TaskDetails', { taskId: task.id }),
       };
     }
@@ -179,7 +182,7 @@ export const useTaskActions = (userId: string, userName: string) => {
       return {
         label: 'View / Edit',
         icon: 'edit' as const,
-        preset: 'secondary' as const,
+        preset: 'primary' as const,
         onPress: () => {
           if (canEditTask(task, userId)) {
             navigation.navigate('EditTask', { taskId: task.id });
@@ -192,7 +195,7 @@ export const useTaskActions = (userId: string, userName: string) => {
 
     return {
       label: 'View',
-      preset: 'secondary' as const,
+      preset: 'primary' as const,
       onPress: () => navigation.navigate('TaskDetails', { taskId: task.id }),
     };
   };

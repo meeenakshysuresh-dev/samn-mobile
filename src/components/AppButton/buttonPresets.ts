@@ -1,3 +1,4 @@
+import { brand } from '../../theme/tokens';
 import { AppTheme } from '../../theme/themes';
 
 export interface ButtonPresetResult {
@@ -11,47 +12,35 @@ export interface ButtonPresetResult {
   gradientLocations?: number[];
 }
 
+const filledPrimary = (): ButtonPresetResult => ({
+  backgroundColor: brand.primary,
+  textColor: brand.onPrimary,
+  borderColor: brand.primary,
+  isGradient: false,
+});
+
 export const buttonPresets = {
-  primary: (theme: AppTheme): ButtonPresetResult => ({
-    backgroundColor: theme.primary,
-    textColor: '#fff',
-    borderColor: theme.primary,
-  }),
+  primary: (_theme: AppTheme): ButtonPresetResult => filledPrimary(),
 
   secondary: (theme: AppTheme): ButtonPresetResult => ({
     backgroundColor: 'transparent',
-    textColor: theme.primary,
-    borderColor: theme.primary,
+    textColor: brand.primary,
+    borderColor: brand.primary,
+    isGradient: false,
   }),
 
-  small: (theme: AppTheme): ButtonPresetResult => ({
-    backgroundColor: theme.primary,
-    textColor: '#fff',
-    borderColor: theme.primary,
-  }),
+  small: (_theme: AppTheme): ButtonPresetResult => filledPrimary(),
 
   inline: (theme: AppTheme): ButtonPresetResult => ({
     backgroundColor: 'transparent',
-    textColor: theme.primary,
+    textColor: brand.primary,
     borderColor: 'transparent',
+    isGradient: false,
   }),
 
-  gradientPrimary: (theme: AppTheme): ButtonPresetResult => ({
-    textColor: '#fff',
-    isGradient: true,
-    gradientColors: theme.gradientAuthButton,
-    start: { x: 0, y: 0.5 },
-    end: { x: 1, y: 0.5 },
-  }),
+  gradientPrimary: (_theme: AppTheme): ButtonPresetResult => filledPrimary(),
 
-  gradientSecondary: (theme: AppTheme): ButtonPresetResult => ({
-    textColor: '#fff',
-    isGradient: true,
-    gradientColors: theme.gradientAuthButton,
-    start: { x: 0.3, y: 0.3 },
-    end: { x: 1, y: 0.3 },
-    gradientLocations: [0.3, 1.0],
-  }),
+  gradientSecondary: (_theme: AppTheme): ButtonPresetResult => filledPrimary(),
 
   gradientDisabled: (_theme: AppTheme): ButtonPresetResult => ({
     textColor: '#F9FAFB',

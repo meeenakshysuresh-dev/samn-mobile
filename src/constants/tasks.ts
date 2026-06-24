@@ -323,7 +323,12 @@ export const RECENT_ACTIVITY: ActivityItem[] = [
   },
 ];
 
-export const formatBudget = (amount: number) => `$${amount.toFixed(0)}`;
+export const formatBudget = (amount: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(amount);
 
 export const TASK_CATEGORY_EMOJI: Record<(typeof TASK_CATEGORIES)[number], string> = {
   Cleaning: '🧹',

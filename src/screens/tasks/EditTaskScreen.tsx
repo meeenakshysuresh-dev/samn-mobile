@@ -151,6 +151,7 @@ export const EditTaskScreen = () => {
       <AppButton
         text={submitting ? 'Saving...' : 'Save Changes'}
         icon={submitting ? undefined : 'check'}
+        preset="primary"
         style={taskFormStyles.submit}
         onPress={() => void handleSubmit()}
         disabled={submitting}

@@ -27,8 +27,8 @@ type Route = RouteProp<CreateStackParamList, 'TaskDetails'>;
 const ACTION_BUTTON_PRESET: Partial<Record<TaskActionKey, 'primary' | 'secondary' | 'inline'>> = {
   accept: 'primary',
   complete: 'primary',
-  edit: 'secondary',
-  start: 'secondary',
+  edit: 'primary',
+  start: 'primary',
   delete: 'inline',
   cancelTask: 'inline',
   cancelAcceptance: 'inline',
@@ -107,7 +107,7 @@ export const TaskDetailsScreen = () => {
 
         <AppCard style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
           <DetailRow icon="mapPin" label="Location" value={task.location} />
-          <DetailRow icon="dollarSign" label="Budget" value={formatBudget(task.budget)} />
+          <DetailRow icon="currencyInr" label="Budget" value={formatBudget(task.budget)} />
           <DetailRow icon="calendar" label="Preferred Time" value={task.preferredDateTime} />
           <DetailRow icon="clock" label="Posted" value={task.postedDate} />
           <DetailRow
