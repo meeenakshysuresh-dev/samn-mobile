@@ -1,8 +1,8 @@
 import React from 'react';
 import { Image, ImageStyle, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 
-export const APP_LOGO = require('../../../assets/icons/samn-logo.png');
-export const APP_WORDMARK = require('../../../assets/icons/samn-wordmark.png');
+export const APP_LOGO = require('../../../assets/icons/samn-logo.jpg');
+export const APP_WORDMARK = require('../../../assets/icons/samn-wordmark.jpg');
 
 export const HEADER_LOGO_SIZE = 40;
 export const HEADER_WORDMARK_WIDTH = 52;
