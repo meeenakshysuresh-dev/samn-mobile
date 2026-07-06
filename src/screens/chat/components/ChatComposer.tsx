@@ -1,6 +1,7 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { memo, useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   Platform,
   Pressable,
   StyleSheet,
@@ -26,13 +27,13 @@ type ChatComposerProps = {
   onLayout?: (height: number) => void;
 };
 
-export const ChatComposer = ({
+export const ChatComposer = memo(function ChatComposer({
   onSend,
   sending,
   disabled = false,
   placeholder = 'Message',
   onLayout,
-}: ChatComposerProps) => {
+}: ChatComposerProps) {
   const { theme } = useAppTheme();
   const inputRef = useRef<TextInput>(null);
 
@@ -51,8 +52,15 @@ export const ChatComposer = ({
 
     setText('');
     setInputHeight(MIN_INPUT_HEIGHT);
+    Keyboard.dismiss();
     await onSend(value);
   }, [disabled, onSend, sending, text]);
+
+  const handleSubmitEditing = useCallback(() => {
+    if (text.trim()) {
+      void handleSend();
+    }
+  }, [handleSend, text]);
 
   const handleChangeText = useCallback((value: string) => {
     setText(value);
@@ -139,7 +147,8 @@ export const ChatComposer = ({
             editable={!sending}
             multiline
             blurOnSubmit={false}
-            returnKeyType="default"
+            returnKeyType="send"
+            onSubmitEditing={handleSubmitEditing}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             textAlignVertical={isMultiline ? 'top' : 'center'}
@@ -186,7 +195,7 @@ export const ChatComposer = ({
       </Pressable>
     </View>
   );
-};
+});
 
 /** Default composer height until onLayout reports the real value. */
 export const CHAT_COMPOSER_DEFAULT_HEIGHT = INPUT_SHELL_MIN_HEIGHT + COMPOSER_VERTICAL_PADDING + StyleSheet.hairlineWidth;
@@ -197,6 +206,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
+    width: '100%',
   },
   wrapShadow: {
     ...Platform.select({
@@ -213,12 +223,14 @@ const styles = StyleSheet.create({
   inputShell: {
     flexDirection: 'row',
     alignItems: 'flex-end',
+    alignSelf: 'stretch',
     borderWidth: 1,
     borderRadius: 24,
     paddingLeft: spacing.lg,
     paddingRight: spacing.xs,
     paddingVertical: spacing.xs,
     gap: spacing.sm,
+    maxHeight: INPUT_SHELL_MIN_HEIGHT + MAX_INPUT_HEIGHT,
   },
   inputShellFocused: {
     ...Platform.select({
@@ -234,12 +246,15 @@ const styles = StyleSheet.create({
   },
   inputArea: {
     flex: 1,
+    flexShrink: 1,
     justifyContent: 'center',
     minHeight: SEND_BUTTON_SIZE,
+    maxHeight: MAX_INPUT_HEIGHT + 16,
     paddingVertical: Platform.OS === 'android' ? 0 : 2,
   },
   input: {
     width: '100%',
+    maxHeight: MAX_INPUT_HEIGHT,
     fontFamily: fontFamily.regular,
     fontSize: 15,
     lineHeight: 22,

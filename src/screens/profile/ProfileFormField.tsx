@@ -3,7 +3,8 @@ import { StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 import { AppInput, AppText, AppView } from '../../components';
 import type { AppInputProps } from '../../components/AppInput';
-import { profileColors, profileStyles } from './profileStyles';
+import { useAppTheme } from '../../theme/useAppTheme';
+import { profileStyles } from './profileStyles';
 
 type ProfileFormFieldProps = Omit<AppInputProps, 'containerStyle'> & {
   label: string;
@@ -19,15 +20,25 @@ export const ProfileFormField: React.FC<ProfileFormFieldProps> = ({
   style,
   placeholderTextColor,
   ...inputProps
-}) => (
-  <AppView style={[profileStyles.fieldSpacing, containerStyle]}>
-    <AppText style={[profileStyles.fieldLabel, labelStyle]}>{label}</AppText>
-    <AppInput
-      {...inputProps}
-      inputWrapperStyle={[profileStyles.inputWrapper, inputWrapperStyle]}
-      style={[profileStyles.inputText, style]}
-      placeholderTextColor={placeholderTextColor ?? profileColors.inputPlaceholder}
-      containerStyle={{ marginBottom: 0 }}
-    />
-  </AppView>
-);
+}) => {
+  const { theme } = useAppTheme();
+
+  return (
+    <AppView style={[profileStyles.fieldSpacing, containerStyle]}>
+      <AppText style={[profileStyles.fieldLabel, { color: theme.textBrandSecondary }, labelStyle]}>
+        {label}
+      </AppText>
+      <AppInput
+        {...inputProps}
+        inputWrapperStyle={[
+          profileStyles.inputWrapper,
+          { backgroundColor: theme.surfaceSecondary, borderColor: theme.border },
+          inputWrapperStyle,
+        ]}
+        style={[profileStyles.inputText, { color: theme.textPrimary }, style]}
+        placeholderTextColor={placeholderTextColor ?? theme.textPlaceholder}
+        containerStyle={{ marginBottom: 0 }}
+      />
+    </AppView>
+  );
+};

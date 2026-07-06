@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   RefreshControl,
   StyleSheet,
@@ -12,20 +12,20 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RouteProp } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, AppView, CommonHeader } from '../../components';
 import { useAuth } from '../../hooks/useAuth';
+import { useChatKeyboardPadding } from '../../hooks/useChatKeyboardPadding';
 import { useChatRoom, useChatRoomUnreadCount } from '../../hooks/useChats';
 import { useMessages } from '../../hooks/useMessages';
 import { useTabBarInset } from '../../navigation/tabBarLayout';
 import type { ChatStackParamList } from '../../navigation/RootNavigator.types';
 import { useAppTheme } from '../../theme/useAppTheme';
-import { header, spacing } from '../../theme/tokens';
+import { spacing } from '../../theme/tokens';
 import type { ChatMessage } from '../../types/message.types';
 import { toChatListItem } from '../../utils/chatMapper';
 import { TaskStatusBadge } from '../tasks/components/TaskStatusBadge';
-import { CHAT_COMPOSER_DEFAULT_HEIGHT, ChatComposer } from './components/ChatComposer';
+import { ChatComposer } from './components/ChatComposer';
 import { MessageBubble } from './components/MessageBubble';
 
 type Nav = NativeStackNavigationProp<ChatStackParamList, 'ChatThread'>;
@@ -35,7 +35,6 @@ export const ChatThreadScreen = () => {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
   const { theme } = useAppTheme();
-  const insets = useSafeAreaInsets();
   const tabBarInset = useTabBarInset();
   const { user } = useAuth();
   const userId = user?.uid ?? 'guest-user';
@@ -46,14 +45,10 @@ export const ChatThreadScreen = () => {
   const threadUnreadCount = useChatRoomUnreadCount(chatRoomId, userId);
   const { messages, sending, error, sendMessage, ready } = useMessages(chatRoomId, userId);
 
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [composerHeight, setComposerHeight] = useState(CHAT_COMPOSER_DEFAULT_HEIGHT);
+  const keyboardPadding = useChatKeyboardPadding(tabBarInset);
 
   const listItem = room ? toChatListItem(room, userId) : null;
   const isReadOnly = room?.status !== 'active';
-  const composerBottomGap = keyboardVisible ? 0 : tabBarInset;
-  const listBottomPadding = composerHeight + composerBottomGap + spacing.md;
-  const keyboardVerticalOffset = insets.top + header.rowMinHeight;
 
   const scrollToLatest = useCallback((animated = true) => {
     if (messages.length > 0) {
@@ -62,21 +57,16 @@ export const ChatThreadScreen = () => {
   }, [messages.length]);
 
   useEffect(() => {
+    if (ready) {
+      const frame = requestAnimationFrame(() => scrollToLatest(false));
+      return () => cancelAnimationFrame(frame);
+    }
+  }, [chatRoomId, ready, scrollToLatest]);
+
+  useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-
-    const showSub = Keyboard.addListener(showEvent, () => {
-      setKeyboardVisible(true);
-      scrollToLatest(true);
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      setKeyboardVisible(false);
-    });
-
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
+    const sub = Keyboard.addListener(showEvent, () => scrollToLatest(true));
+    return () => sub.remove();
   }, [scrollToLatest]);
 
   const renderItem = useCallback(
@@ -87,7 +77,7 @@ export const ChatThreadScreen = () => {
   );
 
   const renderThreadBody = () => (
-    <View style={styles.body}>
+    <Animated.View style={[styles.body, { paddingBottom: keyboardPadding }]}>
       {error ? (
         <AppText preset="bodySmall" style={{ color: theme.error, paddingHorizontal: 20, paddingTop: spacing.sm }}>
           {error}
@@ -109,7 +99,6 @@ export const ChatThreadScreen = () => {
           keyboardDismissMode="interactive"
           contentContainerStyle={[
             styles.listContent,
-            { paddingBottom: listBottomPadding },
             messages.length === 0 && styles.emptyList,
           ]}
           refreshControl={
@@ -124,15 +113,8 @@ export const ChatThreadScreen = () => {
         />
       )}
 
-      <View pointerEvents="box-none" style={[styles.composerDock, { bottom: composerBottomGap }]}>
-        <ChatComposer
-          onSend={sendMessage}
-          sending={sending}
-          disabled={isReadOnly}
-          onLayout={setComposerHeight}
-        />
-      </View>
-    </View>
+      <ChatComposer onSend={sendMessage} sending={sending} disabled={isReadOnly} />
+    </Animated.View>
   );
 
   if (!room) {
@@ -168,17 +150,7 @@ export const ChatThreadScreen = () => {
         }
       />
 
-      {Platform.OS === 'ios' ? (
-        <KeyboardAvoidingView
-          behavior="padding"
-          style={styles.flex}
-          keyboardVerticalOffset={keyboardVerticalOffset}
-        >
-          {renderThreadBody()}
-        </KeyboardAvoidingView>
-      ) : (
-        renderThreadBody()
-      )}
+      {renderThreadBody()}
     </AppView>
   );
 };
@@ -193,11 +165,6 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
   },
-  composerDock: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-  },
   center: {
     flex: 1,
     alignItems: 'center',
@@ -205,6 +172,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingTop: spacing.md,
+    paddingBottom: spacing.md,
     flexGrow: 1,
   },
   emptyList: {

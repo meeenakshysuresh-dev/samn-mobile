@@ -22,9 +22,10 @@ import { useAuth } from '../../hooks/useAuth';
 import { useConfirmExitOnBack } from '../../hooks/useConfirmExitOnBack';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
 import { useTabBarInset } from '../../navigation/tabBarLayout';
+import { useAppTheme } from '../../theme/useAppTheme';
 import { brand, fontFamily, spacing } from '../../theme/tokens';
 import { ProfileFormField } from './ProfileFormField';
-import { profileColors, profileStyles } from './profileStyles';
+import { profileStyles } from './profileStyles';
 import { getInitials } from '../../utils/userName';
 import { hasSkill, normalizeSkills } from '../../utils/skills';
 
@@ -39,6 +40,7 @@ const mapProfileToForm = (profile: ReturnType<typeof useAuth>['userProfile']) =>
 
 export const ProfileScreen = () => {
   const tabBarInset = useTabBarInset();
+  const { theme } = useAppTheme();
   const loader = useLoaderStore();
   const { user, userProfile, saveProfileDetails, authLoading, error, clearError } = useAuth();
 
@@ -161,7 +163,7 @@ export const ProfileScreen = () => {
   const initials = getInitials(displayName);
 
   return (
-    <AppView style={profileStyles.screen}>
+    <AppView style={[profileStyles.screen, { backgroundColor: theme.background }]}>
       <CommonHeader
         title={isEditing ? 'Edit Profile' : 'Profile Details'}
         showBackButton={false}
@@ -184,9 +186,14 @@ export const ProfileScreen = () => {
           ]}
         >
           <AppView style={profileStyles.photoSection}>
-            <AppView style={profileStyles.avatarCircle}>
+            <AppView
+              style={[
+                profileStyles.avatarCircle,
+                { backgroundColor: theme.primaryBgSubtle, borderColor: theme.primaryBorderSubtle },
+              ]}
+            >
               <AppText
-                style={profileStyles.avatarInitials}
+                style={[profileStyles.avatarInitials, { color: theme.textBrandSecondary }]}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 minimumFontScale={0.85}
@@ -244,21 +251,24 @@ export const ProfileScreen = () => {
           />
 
           <AppView style={profileStyles.fieldSpacing}>
-            <AppText style={profileStyles.fieldLabel}>Skills</AppText>
-            <AppView style={profileStyles.skillsRow}>
+            <AppText style={[profileStyles.fieldLabel, { color: theme.textBrandSecondary }]}>Skills</AppText>
+            <AppView style={[profileStyles.skillsRow, { backgroundColor: theme.surfaceSecondary }]}>
               {skills.map((skill, index) =>
                 isEditing ? (
                   <Pressable
                     key={`skill-${index}`}
-                    style={profileStyles.skillChip}
+                    style={[profileStyles.skillChip, { backgroundColor: theme.card, borderColor: theme.primary }]}
                     onPress={() => removeSkill(index)}
                   >
-                    <AppText style={profileStyles.skillChipText}>{skill}</AppText>
-                    <AppIcon name="x" width={12} height={12} color={brand.primary} />
+                    <AppText style={[profileStyles.skillChipText, { color: theme.textBrandSecondary }]}>{skill}</AppText>
+                    <AppIcon name="x" width={12} height={12} color={theme.textBrandSecondary} />
                   </Pressable>
                 ) : (
-                  <AppView key={`skill-${index}`} style={profileStyles.skillChip}>
-                    <AppText style={profileStyles.skillChipText}>{skill}</AppText>
+                  <AppView
+                    key={`skill-${index}`}
+                    style={[profileStyles.skillChip, { backgroundColor: theme.card, borderColor: theme.primary }]}
+                  >
+                    <AppText style={[profileStyles.skillChipText, { color: theme.textBrandSecondary }]}>{skill}</AppText>
                   </AppView>
                 ),
               )}
@@ -268,8 +278,8 @@ export const ProfileScreen = () => {
                   value={skillDraft}
                   onChangeText={setSkillDraft}
                   placeholder="Add skill"
-                  placeholderTextColor={profileColors.inputPlaceholder}
-                  style={profileStyles.skillInput}
+                  placeholderTextColor={theme.textPlaceholder}
+                  style={[profileStyles.skillInput, { color: theme.textPrimary }]}
                   autoFocus
                   onSubmitEditing={addSkill}
                   onBlur={addSkill}
@@ -278,39 +288,43 @@ export const ProfileScreen = () => {
               ) : null}
               {isEditing && !isAddingSkill ? (
                 <Pressable
-                  style={profileStyles.addSkillButton}
+                  style={[profileStyles.addSkillButton, { backgroundColor: theme.primary }]}
                   onPress={() => setIsAddingSkill(true)}
                   accessibilityLabel="Add skill"
                 >
-                  <AppIcon name="plus" width={18} height={18} color="#FFFFFF" />
+                  <AppIcon name="plus" width={18} height={18} color={theme.textOnBrand} />
                 </Pressable>
               ) : null}
             </AppView>
             {!isEditing && skills.length === 0 ? (
-              <AppText style={{ color: profileColors.inputPlaceholder, marginTop: 4 }}>
+              <AppText style={{ color: theme.textSecondary, marginTop: 4 }}>
                 No skills added yet.
               </AppText>
             ) : null}
           </AppView>
 
           <AppView style={profileStyles.fieldSpacing}>
-            <AppText style={profileStyles.fieldLabel}>About Me</AppText>
+            <AppText style={[profileStyles.fieldLabel, { color: theme.textBrandSecondary }]}>About Me</AppText>
             {isEditing ? (
               <TextInput
                 value={aboutMe}
                 onChangeText={setAboutMe}
                 placeholder="Tell us about yourself..."
-                placeholderTextColor={profileColors.inputPlaceholder}
-                style={[profileStyles.textAreaWrapper, profileStyles.inputText, { textAlignVertical: 'top' }]}
+                placeholderTextColor={theme.textPlaceholder}
+                style={[
+                  profileStyles.textAreaWrapper,
+                  profileStyles.inputText,
+                  { backgroundColor: theme.surfaceSecondary, color: theme.textPrimary, textAlignVertical: 'top' },
+                ]}
                 multiline
                 numberOfLines={5}
               />
             ) : (
-              <AppView style={profileStyles.textAreaWrapper}>
+              <AppView style={[profileStyles.textAreaWrapper, { backgroundColor: theme.surfaceSecondary }]}>
                 <AppText
                   style={[
                     profileStyles.inputText,
-                    { color: aboutMe ? '#111827' : profileColors.inputPlaceholder },
+                    { color: aboutMe ? theme.textPrimary : theme.textPlaceholder },
                   ]}
                 >
                   {aboutMe || 'No description added yet.'}
@@ -320,26 +334,31 @@ export const ProfileScreen = () => {
           </AppView>
 
           {error ? (
-            <AppText style={[profileStyles.formMessage, profileStyles.formError]}>{error}</AppText>
+            <AppText style={[profileStyles.formMessage, { color: theme.error }]}>{error}</AppText>
           ) : null}
 
           {isEditing ? (
             <AppView style={styles.actionRow}>
               <Pressable
-                style={[styles.halfButton, styles.cancelButton]}
+                style={[styles.halfButton, styles.cancelButton, { borderColor: theme.primary }]}
                 onPress={handleCancel}
                 disabled={authLoading}
               >
-                <AppIcon name="x" width={18} height={18} color={brand.primary} />
-                <AppText style={styles.cancelLabel}>Cancel</AppText>
+                <AppIcon name="x" width={18} height={18} color={theme.primary} />
+                <AppText style={[styles.cancelLabel, { color: theme.primary }]}>Cancel</AppText>
               </Pressable>
               <Pressable
-                style={[styles.halfButton, styles.saveButton, authLoading && styles.saveButtonDisabled]}
+                style={[
+                  styles.halfButton,
+                  styles.saveButton,
+                  { backgroundColor: theme.primary, borderColor: theme.primary },
+                  authLoading && styles.saveButtonDisabled,
+                ]}
                 onPress={handleSave}
                 disabled={authLoading}
               >
-                <AppIcon name="check" width={18} height={18} color="#FFFFFF" />
-                <AppText style={styles.saveLabel}>Save</AppText>
+                <AppIcon name="check" width={18} height={18} color={theme.textOnBrand} />
+                <AppText style={[styles.saveLabel, { color: theme.textOnBrand }]}>Save</AppText>
               </Pressable>
             </AppView>
           ) : null}
