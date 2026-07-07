@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 
-import { AppInput, AppRadioGroup, AppText } from '../../../components';
+import { AppIcon, AppInput, AppRadioGroup, AppText } from '../../../components';
 import { TASK_PRIORITY_OPTIONS } from '../../../constants/tasks';
 import { useAppTheme } from '../../../theme/useAppTheme';
 import { spacing } from '../../../theme/tokens';
@@ -160,6 +160,9 @@ type TaskFormFieldsProps = {
   onChangePreferredDateTime: (value: string) => void;
   onChangePriority: (value: TaskPriority) => void;
   showIntro?: boolean;
+  /** When provided, renders a "Use current location" action under the Location field. */
+  onUseCurrentLocation?: () => void;
+  isLocatingLocation?: boolean;
 };
 
 export const TaskFormFields = ({
@@ -173,6 +176,8 @@ export const TaskFormFields = ({
   onChangePreferredDateTime,
   onChangePriority,
   showIntro = true,
+  onUseCurrentLocation,
+  isLocatingLocation = false,
 }: TaskFormFieldsProps) => {
   const { theme } = useAppTheme();
 
@@ -237,6 +242,26 @@ export const TaskFormFields = ({
         style={taskFormStyles.inputText}
         placeholderTextColor={theme.textSecondary}
       />
+
+      {onUseCurrentLocation ? (
+        <Pressable
+          style={taskFormStyles.locationActionRow}
+          onPress={onUseCurrentLocation}
+          disabled={isLocatingLocation}
+          accessibilityRole="button"
+          accessibilityLabel="Use current location"
+          accessibilityState={{ disabled: isLocatingLocation }}
+        >
+          {isLocatingLocation ? (
+            <ActivityIndicator size="small" color={theme.primary} />
+          ) : (
+            <AppIcon name="crosshair" width={16} height={16} color={theme.primary} />
+          )}
+          <AppText style={[taskFormStyles.locationActionText, { color: theme.primary }]}>
+            {isLocatingLocation ? 'Fetching location…' : 'Use current location'}
+          </AppText>
+        </Pressable>
+      ) : null}
 
       <AppInput
         label="Budget / Price"

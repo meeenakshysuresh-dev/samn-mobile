@@ -29,6 +29,20 @@ export const taskFormStyles = StyleSheet.create({
   locationField: {
     marginTop: spacing.xxl,
   },
+  locationActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    marginTop: -spacing.sm,
+    marginBottom: spacing.lg,
+    marginLeft: 2,
+    paddingVertical: spacing.xs,
+  },
+  locationActionText: {
+    fontFamily: fontFamily.semibold,
+    fontSize: normalize(13),
+  },
   inputWrapper: {
     borderRadius: taskFormLayout.inputRadius,
     minHeight: taskFormLayout.inputHeight,
@@ -57,5 +71,8 @@ export const taskFormStyles = StyleSheet.create({
   },
   submit: {
     marginTop: spacing.md,
+  },
+  submitDisabled: {
+    opacity: 0.5,
   },
 });

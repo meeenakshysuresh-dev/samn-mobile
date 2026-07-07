@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { AppButton, AppInput, AppText, AppView } from '../../components';
+import { HeaderAppWordmark } from '../../components/AppLogo/AppLogo';
 import { useAuth } from '../../hooks/useAuth';
 import { useLoaderStore } from '../../hooks/useLoaderStore';
 import type { AuthStackParamList } from '../../navigation/RootNavigator.types';
@@ -46,6 +47,7 @@ export const LoginScreen = () => {
     <AuthScreenLayout
       headerTitle="Login"
       showBack={false}
+      headerLeftContent={<HeaderAppWordmark />}
       footer={
         <AppView style={authStyles.footerRow}>
           <AppText style={authStyles.footerText}>Don&apos;t have an account? </AppText>

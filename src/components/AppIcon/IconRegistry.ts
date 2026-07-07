@@ -27,6 +27,7 @@ export const IconRegistry = {
   chevronRight: vector('feather', 'chevron-right'),
   chevronUp: vector('feather', 'chevron-up'),
   clock: vector('feather', 'clock'),
+  crosshair: vector('feather', 'crosshair'),
   download: vector('feather', 'download'),
   edit: vector('feather', 'edit-2'),
   eye: vector('feather', 'eye'),

@@ -16,6 +16,8 @@ type AuthScreenLayoutProps = {
   centered?: boolean;
   /** Vertically centers the main form block between top and footer. */
   centerForm?: boolean;
+  /** Optional content for the header's left slot (e.g. brand logo). */
+  headerLeftContent?: React.ReactNode;
 };
 
 export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
@@ -27,6 +29,7 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
   scrollable = true,
   centered = false,
   centerForm = true,
+  headerLeftContent,
 }) => {
   useHeaderStatusBar();
 
@@ -72,6 +75,7 @@ export const AuthScreenLayout: React.FC<AuthScreenLayoutProps> = ({
           title={headerTitle}
           onBack={onBack}
           showBackButton={showBack}
+          leftContent={headerLeftContent}
           safeArea={false}
         />
       ) : null}

@@ -57,6 +57,14 @@ export type CreateTaskInput = {
   preferredDateTime: string;
   priority: TaskPriority;
   images?: string[];
+  /** Optional GPS coordinates captured via "Use current location", for future API use. */
+  latitude?: number;
+  longitude?: number;
+  /** Optional reverse-geocoded address parts, for future API use. */
+  locationCity?: string;
+  locationState?: string;
+  locationCountry?: string;
+  locationPostalCode?: string;
 };
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;

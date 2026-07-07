@@ -80,7 +80,7 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
   const navigation = useNavigation();
   const theme = useThemeStore(state => state.theme);
   const isRTL = useIsRTL();
-  const styles = createAppHeaderStyles(theme, isRTL);
+    const styles = createAppHeaderStyles(theme, isRTL);
 
   const handleBack = () => {
     if (onBack) {
@@ -104,14 +104,14 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
       <AppView style={[styles.gradientHeaderContent, { paddingTop: topPadding }]}>
         <AppView style={[styles.gsHeaderRow, { marginBottom: 0 }]}>
           {showBackButton ? (
-            <TouchableOpacity
-              style={styles.gsBackBtnPill}
-              onPress={handleBack}
-              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
-              accessibilityLabel="Go back"
-            >
+          <TouchableOpacity
+            style={styles.gsBackBtnPill}
+            onPress={handleBack}
+            hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+            accessibilityLabel="Go back"
+          >
               <AppIcon name="chevronLeft" width={headerTokens.iconSize} height={headerTokens.iconSize} color={theme.headerText} rtlFlip={isRTL} />
-            </TouchableOpacity>
+          </TouchableOpacity>
           ) : leftContent ? (
             <AppView style={styles.gsHeaderLeftSlot}>{leftContent}</AppView>
           ) : (
@@ -129,15 +129,15 @@ export const StandardHeader: React.FC<GradientHeaderProps> = ({
             ]}
           >
             {title ? (
-              <AppText
+            <AppText
                 preset={greetingTitle ? 'headerGreeting' : 'headerTitle'}
-                style={[
+              style={[
                   greetingTitle ? styles.greeting : styles.gsHeaderTitle,
-                  { textAlign: isRTL ? 'right' : 'left' },
-                ]}
-              >
-                {title}
-              </AppText>
+                { textAlign: isRTL ? 'right' : 'left' },
+              ]}
+            >
+              {title}
+            </AppText>
             ) : null}
             {subtitle ? (
               <AppText
@@ -220,7 +220,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   const insets = useSafeAreaInsets();
   const theme = useThemeStore(state => state.theme);
   const isRTL = useIsRTL();
-  const styles = createAppHeaderStyles(theme, isRTL);
+    const styles = createAppHeaderStyles(theme, isRTL);
 
   const topPadding = Math.max(
     insets.top,
@@ -272,11 +272,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             {onSettings ? (
               <HeaderIconButton
                 icon="settings"
-                onPress={onSettings}
+              onPress={onSettings}
                 color={theme.headerText}
-                accessibilityLabel="Settings"
+              accessibilityLabel="Settings"
                 pillStyle={styles.gsBackBtnPill}
-              />
+            />
             ) : null}
           </AppView>
         </AppView>
@@ -310,7 +310,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const theme = useThemeStore(state => state.theme);
   const navigation = useNavigation();
   const isRTL = useIsRTL();
-  const styles = createAppHeaderStyles(theme, isRTL);
+    const styles = createAppHeaderStyles(theme, isRTL);
   const isHome = preset === 'home';
   const isBack = preset === 'back';
   const _centerAligned = centerAligned ?? !(isHome || isBack);
